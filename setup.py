@@ -18,8 +18,8 @@ setup (
   description = 'Software to accompany the Focal Plane Electronics (FPE) for the Transiting Exoplanet Survey Satellite (TESS)',
   author = 'Matthew Wampler-Doty Doty',
   author_email = 'matthew.wampler.doty@gmail.com',
-  url = 'https://github.com/TESScience/FPE', # use the URL to the github repo
-  download_url = 'https://github.com/TESScience/FPE/tarball/{VERSION}'.format(VERSION=VERSION),
+  url = 'https://github.com/TESScience/tessfpe', # use the URL to the github repo
+  download_url = 'https://github.com/TESScience/tessfpe/tarball/{VERSION}'.format(VERSION=VERSION),
   scripts = glob.glob('scripts/*'),
   install_requires=[
       'grako>=3.6.3',
