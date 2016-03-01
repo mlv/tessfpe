@@ -5,6 +5,7 @@ all: install
 
 .venv-clean: .venv-clean/src/BLAS
 	virtualenv -p $(shell which python2.7) $@
+	.venv-clean/bin/pip install --upgrade pip
 	BLAS_SRC=.venv-clean/src/BLAS .venv-clean/bin/pip install -r requirements.txt
 
 venv: .venv-clean

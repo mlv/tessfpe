@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS
 
 
-__version__ = (2015, 12, 8, 21, 3, 39, 1)
+__version__ = (2016, 3, 1, 16, 13, 53, 1)
 
 __all__ = [
     'SequencerDSLParser',
@@ -27,21 +27,13 @@ __all__ = [
 
 
 class SequencerDSLParser(Parser):
-    def __init__(self,
-                 whitespace=None,
-                 nameguard=None,
-                 comments_re='\\/\\*.*?\\*\\/',
-                 eol_comments_re='\\/\\/.*?$',
-                 ignorecase=None,
-                 left_recursion=True,
-                 **kwargs):
+    def __init__(self, whitespace=None, nameguard=None, **kwargs):
         super(SequencerDSLParser, self).__init__(
             whitespace=whitespace,
             nameguard=nameguard,
-            comments_re=comments_re,
-            eol_comments_re=eol_comments_re,
-            ignorecase=ignorecase,
-            left_recursion=left_recursion,
+            comments_re='\\/\\*.*?\\*\\/',
+            eol_comments_re='\\/\\/.*?$',
+            ignorecase=None,
             **kwargs
         )
 

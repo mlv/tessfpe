@@ -1,5 +1,6 @@
 from setuptools import setup, find_packages
 import glob
+VERSION = '6.2.3'
 setup (
   name = 'tessfpe',
   packages = find_packages(),
@@ -13,18 +14,18 @@ setup (
                   'sequencer_dsl/tikz/Makefile.template',  # Add Makefile template used for compiling TikZ timing diagrams
                  ],
   },
-  version = '6.2.2.dev0',
+  version = VERSION,
   description = 'Software to accompany the Focal Plane Electronics (FPE) for the Transiting Exoplanet Survey Satellite (TESS)',
-  author = 'John Doty',
-  author_email = 'jpd@noqsi.com',
+  author = 'Matthew Wampler-Doty Doty',
+  author_email = 'matthew.wampler.doty@gmail.com',
   url = 'https://github.com/TESScience/FPE', # use the URL to the github repo
-  download_url = 'https://github.com/TESScience/FPE/tarball/6.2.2.dev0',
+  download_url = 'https://github.com/TESScience/FPE/tarball/{VERSION}'.format(VERSION=VERSION),
   scripts = glob.glob('scripts/*'),
   install_requires=[
       'grako>=3.6.3',
       'pandas>=0.17.1',
       'sh>=1.11',
-      #'matplotlib>=1.5.0',
+      'matplotlib>=1.5.0',
       'termcolor>=1.1.0'
   ],
 )
