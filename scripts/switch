@@ -7,6 +7,7 @@ RED="$(tput setaf 1)"
 GREEN="$(tput setaf 2)"
 RESET="$(tput sgr0)"
 CURL_COOKIE=${HOME}/.reset_switch_curl_cookie
+ALL_SWITCHES=$(seq 1 6)
 
 # Use curl to try to get the status of the reset board and process its HTML
 function outlet_status {
@@ -23,8 +24,12 @@ function outlet_status {
       -e 's/<b><font color=green>//g' \
       -e 's/<\/font><\/b>.*$//g' \
       -e "s/OFF/${RED}OFF${RESET}/g" \
-      -e "s/ON/${GREEN}ON${RESET}/g" | \
-  column -t -s $'\t'
+      -e "s/ON/${GREEN}ON${RESET}/g"
+}
+
+function print_outlet_status {
+   outlet_status | \
+   column -t -s $'\t'
 }
 
 function login {
@@ -49,21 +54,57 @@ function turn_switch_off {
   curl -s --cookie ${CURL_COOKIE} 192.168.0.100/outlet?${1}=OFF > /dev/null
 }
 
-function turn_all_switches_on {
-  for i in $(seq 1 7); do
+function get_arguments {
+  STATUS=$(outlet_status | cut -f1,2 | tr '\n' '¶' | tr '\t' '⇒')
+  for arg in "$@"; do
+     if [[ $arg == --* ]] ; then
+        break
+     fi
+     QUERY=$(echo $STATUS | tr '¶' '\n' | grep $arg)
+     if [[ $(echo $QUERY | tr '⇒' '\n' | grep ^$arg$) == $arg ]] ; then 
+        echo $(echo $QUERY | tr '⇒' '\t' | cut -f1)
+     else
+        echo "Could not find switch: $arg" > /dev/stderr
+        exit 1
+     fi
+  done
+}
+
+function turn_switches_on {
+  ARGUMENTSX=$(get_arguments $@ ; echo ▶︎$?)
+  EXIT_CODE=${ARGUMENTSX##*▶︎}
+  if [[ $EXIT_CODE != "0" ]] ; then
+     exit $EXIT_CODE
+  fi
+  ARGUMENTS=${ARGUMENTSX%▶︎*}
+  if [[ -z ${ARGUMENTS} ]] ; then
+     echo "No arguments specified" > /dev/stderr
+     exit 1
+  fi
+  for i in ${ARGUMENTS}; do
      turn_switch_on $i
   done
-  outlet_status
+  print_outlet_status
 }
 
-function turn_all_switches_off {
-  for i in $(seq 1 7); do
+function turn_switches_off {
+  ARGUMENTSX=$(get_arguments $@ ; echo ▶︎$?)
+  EXIT_CODE=${ARGUMENTSX##*▶︎}
+  if [[ $EXIT_CODE != "0" ]] ; then
+     exit $EXIT_CODE
+  fi
+  ARGUMENTS=${ARGUMENTSX%▶︎*}
+  if [[ -z ${ARGUMENTS} ]] ; then
+     echo "No arguments specified" > /dev/stderr
+     exit 1
+  fi
+  for i in ${ARGUMENTS}; do
      turn_switch_off $i
   done
-  outlet_status
+  print_outlet_status
 }
 
-if [[ $@ =~ "--help" ]] || [[ $@ =~ "-h" ]]; then
+if [[ $@ == "--help" ]] || [[ $@ == "-h" ]]; then
        cat <<EOF
 usage: $0 [-h] [--off] [--on] [--reset]
 
@@ -72,10 +113,13 @@ Control the hardware power switch attached to the Observatory Simulator.
 If no argument is given, prints the status of the switch.
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --off                 turn all of the hardware switches off
-  --on                  turn all of the hardware switches on
-  --reset               turn all of the hardware switches off and then on
+  -h, --help                  show this help message and exit
+  --on                        turn on specified switches
+  --on-all, --all-on          turn on all switches
+  --off                       turn off specified switches
+  --off-all, --all-off        turn off all switches
+  --reset                     reset specified switches
+  --reset-all, --reset-off    turn off all switches
 EOF
        exit 0
 fi
@@ -83,27 +127,43 @@ fi
 login
 
 if [[ $# -eq 0 ]] ; then
-   outlet_status
+   print_outlet_status
    exit 0
 fi
 
 for key in "$@" ; do
    case $key in
-       --off)
-       turn_all_switches_off
+       --all-off|--off-all)
        shift
+       turn_switches_off $ALL_SWITCHES
+       ;;
+       --off)
+       shift
+       turn_switches_off $@
+       ;;
+       --all-on|--on-all)
+       shift
+       turn_switches_on $ALL_SWITCHES
        ;;
        --on)
-       turn_all_switches_on
        shift
+       turn_switches_on $@
+       ;;
+       --reset-all|--all-reset)
+       shift
+       turn_switches_off $ALL_SWITCHES
+       echo "----------------"
+       turn_switches_on $ALL_SWITCHES
        ;;
        --reset)
-       turn_all_switches_off
-       echo "----------------"
-       turn_all_switches_on
        shift
+       turn_switches_off $@
+       echo "----------------"
+       turn_switches_on $@
        ;;
        *)
+       # Skip argument
+       shift
        ;;
    esac
 done
