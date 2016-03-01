@@ -1,6 +1,10 @@
 #!/bin/bash
 
-set -euo pipefail
+# http://redsymbol.net/articles/unofficial-bash-strict-mode/
+set -eo pipefail
+# WARNING: Bash 4.1 exposes no way of safely determining if a variable is not set
+# If you upgrade to Bash 4.2, you can uncomment the following line, and another in LOGIN
+#set -u
 IFS=$'\n\t'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 RED="$(tput setaf 1)"
@@ -22,22 +26,27 @@ function outlet_status {
       -e 's/<\/td><td>/\t/g' \
       -e 's/<b><font color=red>//g' \
       -e 's/<b><font color=green>//g' \
-      -e 's/<\/font><\/b>.*$//g' \
-      -e "s/OFF/${RED}OFF${RESET}/g" \
-      -e "s/ON/${GREEN}ON${RESET}/g"
+      -e 's/<\/font><\/b>.*$//g'
 }
 
-function print_outlet_status {
-   outlet_status | \
-   column -t -s $'\t'
+function pretty_print_outlet_status {
+  outlet_status | \
+  sed -e "s/OFF/${RED}OFF${RESET}/g" \
+      -e "s/ON/${GREEN}ON${RESET}/g" | \
+  column -t -s $'\t'
 }
 
 function login {
-  if [ -z "$(outlet_status)" ] ; then
+  if [[ -z "$(outlet_status)" ]] ; then
      rm -f ${DIR}/.curl_cookie
-     echo -n "Password: "
-     read -s PASSWORD
-     echo
+     # WARNING: If you have bash 4.2, you can do this
+     # if [[ -v PASSWORD ]] ; then
+     # Instead we do something less safe
+     if [[ -z "$PASSWORD" ]] ; then
+        echo -n "Password: "
+        read -s PASSWORD
+        echo
+     fi 
      curl -s -d "Username=tess" -d "Password=${PASSWORD}" --cookie-jar ${CURL_COOKIE} 192.168.0.100/login.tgi > /dev/null
      if [ -z "$(outlet_status)" ] ; then
         echo "${RED}LOGIN FAILED ✗${RESET}" > /dev/stderr
@@ -84,7 +93,7 @@ function turn_switches_on {
   for i in ${ARGUMENTS}; do
      turn_switch_on $i
   done
-  print_outlet_status
+  pretty_print_outlet_status
 }
 
 function turn_switches_off {
@@ -101,7 +110,7 @@ function turn_switches_off {
   for i in ${ARGUMENTS}; do
      turn_switch_off $i
   done
-  print_outlet_status
+  pretty_print_outlet_status
 }
 
 if [[ $@ == "--help" ]] || [[ $@ == "-h" ]]; then
@@ -127,7 +136,7 @@ fi
 login
 
 if [[ $# -eq 0 ]] ; then
-   print_outlet_status
+   pretty_print_outlet_status
    exit 0
 fi
 
