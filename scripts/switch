@@ -3,7 +3,7 @@
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -eo pipefail
 # WARNING: Bash 4.1 exposes no way of safely determining if a variable is not set
-# If you upgrade to Bash 4.2, you can uncomment the following line, and another in LOGIN
+# If you upgrade to Bash 4.2, you can uncomment the following line, and another in the `login` function
 #set -u
 IFS=$'\n\t'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
