@@ -42,6 +42,7 @@ if __name__ == "__main__":
                          raise Exception("Unknown parameter: {}".format(k))
                     if (k + '_offset') not in set_parameters:
                         fpe.ops[k].value = v
+                fpe.ops.send()
              print json.dumps(fpe.ops.values, sort_keys=True, indent=4, separators=(',', ': '))
              sys.exit(0)  # 0 is SUCCESS for shell commands
         finally:
