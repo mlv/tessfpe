@@ -14,15 +14,5 @@ test: $(FPE_TESTS)
 SequencerDSLParser.py: SequencerDSL.ebnf
 	grako $< -o $@
 
-%_standalone_grammer.ebnf: %.ebnf
-	echo '@@comments :: ?/\/\*.*?\*\//?' > $@
-	echo '@@eol_comments :: ?/\/\/.*?$$/?' >> $@
-	echo '#include :: "Terms.ebnf"' >> $@
-	echo '#include :: "State_Changes.ebnf"' >> $@
-	echo '#include :: "$<"' >> $@
-
-%Parser.py: %_standalone_grammer.ebnf
-	grako $< -o $@
-
 clean:
-	rm -rf *Parser.py *_standalone_grammar.ebnf *.pyc
+	rm -rf *Parser.py *.pyc
