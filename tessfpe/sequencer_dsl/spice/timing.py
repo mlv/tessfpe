@@ -43,13 +43,14 @@ def timing_for_bit(sequence, sequence_name, sequencer_bit, default_value="vlow")
                 values.append(level)
         if sequencer_bit in s:
             level = timing_letter(s[sequencer_bit])
+    sequencer_bit_munged = sequencer_bit.upper().replace('-','_')
     values += [values[-1] for _ in range(max(0, 24 - len(values)))]
-    sequence_title = '* Sequence: {}, Bit: {} *'.format(sequence_name, sequencer_bit.upper())
+    sequence_title = '* Sequence: {}, Bit: {} *'.format(sequence_name, sequencer_bit_munged)
     sep = '*' * len(sequence_title)
     return (sep + '\n' +
             sequence_title + '\n' +
             sep + '\n\n' +
-            'V{0} {0} 0 PWL\n'.format(sequencer_bit.upper()) +
+            'V{0} {0} 0 PWL\n'.format(sequencer_bit_munged) +
             '+0 {{{}}}\n'.format(default_value) +
             "\n".join(('+{{{idx}*tclock+trise}}{{{value}}}\n' +
                        '+{{{idx}*tclock+trise}}{{{value}}}').format(
