@@ -8,6 +8,5 @@ multi_step = "step" "(" steps:expression ")" ;
 steps = {(multi_step | single_step)}+ ;
 signal = state_changes steps ;
 signals = {signal}+ ;
-subsequence = symbol ;
-sequence_body = {(signals | subsequence)}+ ;
+sequence_body = {signals}+ ;
 sequence = "sequence" name:symbol "{" value:sequence_body "}" ;

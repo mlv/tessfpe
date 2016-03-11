@@ -17,7 +17,7 @@ from grako.parsing import graken, Parser
 from grako.util import re, RE_FLAGS
 
 
-__version__ = (2016, 3, 1, 16, 13, 53, 1)
+__version__ = (2016, 3, 11, 22, 3, 15, 4)
 
 __all__ = [
     'SequencerDSLParser',
@@ -252,20 +252,10 @@ class SequencerDSLParser(Parser):
         self._positive_closure(block0)
 
     @graken()
-    def _subsequence_(self):
-        self._symbol_()
-
-    @graken()
     def _sequence_body_(self):
 
         def block0():
-            with self._group():
-                with self._choice():
-                    with self._option():
-                        self._signals_()
-                    with self._option():
-                        self._subsequence_()
-                    self._error('no available options')
+            self._signals_()
         self._positive_closure(block0)
 
     @graken()
@@ -470,9 +460,6 @@ class SequencerDSLSemantics(object):
         return ast
 
     def signals(self, ast):
-        return ast
-
-    def subsequence(self, ast):
         return ast
 
     def sequence_body(self, ast):
