@@ -100,11 +100,17 @@ class FPE(object):
         if fpe_wrapper_binary is None:
             fpe_wrapper_binary = os.path.join(self._dir, "MemFiles",
                                            "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
-        assert os.path.isfile(fpe_wrapper_binary), "Wrapper does not exist: {}".format(fpe_wrapper_binary)
+        if not os.path.isfile(fpe_wrapper_binary):
+            # Maybe we specified a version instead of a real file? No harm in trying...
+            file_name = os.path.join(self._dir, "MemFiles",
+                                           "FPE_Wrapper-{version}.bin".format(version=fpe_wrapper_binary))
+            if os.path.isfile(file_name):
+                fpe_wrapper_binary = file_name
+        assert os.path.isfile(fpe_wrapper_binary), "Wrapper file '{}' does not exist".format(fpe_wrapper_binary)
         if self.frames_running_status is True\
                 and force is not True\
                 and dhu_reset is not True:
-            return "Frames are reporting to be running, *NOT* loading wrapper (tried to load {})".format(
+            return "Frames are reporting to be running, *NOT* loading wrapper (tried to load '{}')".format(
                 fpe_wrapper_binary)
         try:
             frames_status = self.frames_running_status
