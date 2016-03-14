@@ -5,10 +5,11 @@ if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
     import sys
     import argparse
+
     parser = argparse.ArgumentParser(description='Stop running frames')
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     args = parser.parse_args()
-    
-    with FPE(args.FPE_number, sanity_checks=False) as fpe:
+
+    with FPE(args.FPE_number) as fpe:
         print fpe.cam_stop_frames()
         sys.exit(0)  # 0 is SUCCESS for shell commands

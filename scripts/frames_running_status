@@ -8,11 +8,24 @@ if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description='Get the status of whether the frames are running or not')
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
+    parser.add_argument('--check-running', action='store_true', help='Check that frames are running')
+    parser.add_argument('--check-not-running', action='store_true', help='Check that frames are *NOT* running')
     args = parser.parse_args()
- 
-    with FPE(1, sanity_checks=False) as fpe:
+
+    if args.check_running is True and args.check_not_running is True:
+        raise RuntimeError("Cannot specify both '--check-running' and '--check-not-running' at the same time")
+
+    with FPE(args.FPE_number) as fpe:
         if fpe.frames_running_status:
             print "Frames are running"
+            if args.check_running is True:
+                sys.exit(0)
+            if args.check_not_running is True:
+                sys.exit(1)
         else:
             print "Frames are not running"
-        sys.exit(0)  # 0 is SUCCESS for shell commands
+            if args.check_running is True:
+                sys.exit(1)
+            if args.check_not_running is True:
+                sys.exit(0)
+    sys.exit(0)
