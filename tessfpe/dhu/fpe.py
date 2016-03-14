@@ -138,7 +138,7 @@ class FPE(object):
             assert self.upload_housekeeping_memory(house_keeping_memory), \
                 "Could not load house keeping memory: {}".format(house_keeping_memory)
             # Reset the camera again, this time checking that housekeeping is reporting sane values
-            self.cam_reset(upload=True, sanity_checks=True)
+            #self.cam_reset(upload=True, sanity_checks=True)
             # Set the operating parameters to their defaults
             assert self.ops.reset_to_defaults(), "Could not send default operating parameters"
             # Check the house keeping is porting sane values (since we are paranoid)
@@ -282,12 +282,12 @@ class FPE(object):
         from fpesocketconnection import TimeOutError
         if self.frames_running_status is True:
             return "Control status indicates frames are already running"
-        try:
-            check_house_keeping_voltages(self)
-        except (UnexpectedHousekeeping, TimeOutError):
-            # If auto load is set, try to automatically upload the wrapper if house_keeping isn't sane
-            if auto_load is True:
-                self.load_wrapper()
+        # try:
+        #     check_house_keeping_voltages(self)
+        # except (UnexpectedHousekeeping, TimeOutError):
+        #     # If auto load is set, try to automatically upload the wrapper if house_keeping isn't sane
+        #     if auto_load is True:
+        #         self.load_wrapper()
         return self.connection.send_command(
             "cam_start_frames",
             reply_pattern="(Starting frames...|Frames already enabled)"
