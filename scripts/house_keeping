@@ -26,7 +26,6 @@ def match_channels(patterns, channels, sort=False):
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
     from tessfpe.data.housekeeping_channels import housekeeping_channels, report_table
-    from tessfpe.dhu.unit_tests import voltage_reference_values
     from copy import deepcopy
     import argparse
     import sys
