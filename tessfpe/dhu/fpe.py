@@ -43,6 +43,7 @@ class FPE(object):
         self._debug = debug
         self._dir = os.path.dirname(os.path.realpath(__file__))
         self._reset_in_progress = False
+        self._loading_wrapper = False
         self.fpe_number = number
         self.connection = FPESocketConnection(5554 + number, self._debug)
 
@@ -97,23 +98,26 @@ class FPE(object):
         import os.path
         from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
         from fpesocketconnection import TimeOutError
-        if fpe_wrapper_binary is None:
-            fpe_wrapper_binary = os.path.join(self._dir, "MemFiles",
-                                           "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
-        if not os.path.isfile(fpe_wrapper_binary):
-            # Maybe we specified a version instead of a real file? No harm in trying...
-            file_name = os.path.join(self._dir, "MemFiles",
-                                           "FPE_Wrapper-{version}.bin".format(version=fpe_wrapper_binary))
-            if os.path.isfile(file_name):
-                fpe_wrapper_binary = file_name
-        assert os.path.isfile(fpe_wrapper_binary), "Wrapper file '{}' does not exist".format(fpe_wrapper_binary)
-        if self.frames_running_status is True\
-                and force is not True\
-                and dhu_reset is not True:
-            return "Frames are reporting to be running, *NOT* loading wrapper (tried to load '{}')".format(
-                fpe_wrapper_binary)
+        if self._loading_wrapper is True:
+            return "Already in the process of trying to load the wrapper, not proceeding"
         try:
+            self._loading_wrapper = True
             frames_status = self.frames_running_status
+            if fpe_wrapper_binary is None:
+                fpe_wrapper_binary = os.path.join(self._dir, "MemFiles",
+                                               "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
+            if not os.path.isfile(fpe_wrapper_binary):
+                # Maybe we specified a version instead of a real file? No harm in trying...
+                file_name = os.path.join(self._dir, "MemFiles",
+                                               "FPE_Wrapper-{version}.bin".format(version=fpe_wrapper_binary))
+                if os.path.isfile(file_name):
+                    fpe_wrapper_binary = file_name
+            assert os.path.isfile(fpe_wrapper_binary), "Wrapper file '{}' does not exist".format(fpe_wrapper_binary)
+            if self.frames_running_status is True\
+                    and force is not True\
+                    and dhu_reset is not True:
+                return "Frames are reporting to be running, *NOT* loading wrapper (tried to load '{}')".format(
+                    fpe_wrapper_binary)
             if force or dhu_reset:
                 raise ForcedWrapperLoad()
             self.frames_running_status = False
@@ -142,6 +146,7 @@ class FPE(object):
             return "Wrapper version {} loaded successfully".format(wrapper_version)
         finally:
             self.frames_running_status = frames_status
+            self._loading_wrapper = False
 
     def close(self):
         """Close the fpe object (namely its socket connection)"""
