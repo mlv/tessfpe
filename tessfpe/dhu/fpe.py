@@ -65,21 +65,31 @@ class FPE(object):
             if original_frames_running_status is not None:
                 self.frames_running_status = original_frames_running_status
 
-    def load_wrapper(self, wrapper_version='6.1t.4'):
+    def load_wrapper(self,
+                     fpe_wrapper_bin=None,
+                     wrapper_version='6.1t.5',
+                     force_dhu_reset=False):
+        """
+        Load an FPGA wrapper.  Checks to see if housekeeping is reporting sane values
+        :param fpe_wrapper_bin:
+        :param wrapper_version:
+        :return:
+        """
         import os.path
         from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
         from fpesocketconnection import TimeOutError
-        fpe_wrapper_bin = os.path.join(self._dir, "MemFiles",
-                                       "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
-
-        assert os.path.isfile(fpe_wrapper_bin), "Wrapper does not exist for version {}".format(wrapper_version)
-        status = self.frames_running_status
+        if fpe_wrapper_bin is None:
+            fpe_wrapper_bin = os.path.join(self._dir, "MemFiles",
+                                           "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
+        assert os.path.isfile(fpe_wrapper_bin), "Wrapper does not exist: {}".format(fpe_wrapper_bin)
+        if self.frames_running_status is True:
+            return "Frames are reporting to be running, *NOT* loading wrapper (tried to load {})".format(fpe_wrapper_bin)
         try:
             self.frames_running_status = False
             self.cmd_hsk(retries=1)
             check_house_keeping_voltages(self)
             return "House keeping reports sane values for reference voltages," \
-                   " *NOT* loading wrapper (tried to load version {})".format(wrapper_version)
+                   " *NOT* loading wrapper (tried to load {})".format(fpe_wrapper_bin)
         except (UnexpectedHousekeeping, TimeOutError):
             self.cmd_rst(upload=False, sanity_checks=False)
             # assert "Cam FPGA done." in self.cmd_fpga_rst(), "Could not reset the FPGA"
@@ -94,8 +104,6 @@ class FPE(object):
             assert self.ops.reset_to_defaults(), "Could not send operating parameters"
             check_house_keeping_voltages(self)
             return "Wrapper version {} loaded successfully".format(wrapper_version)
-        finally:
-            self.frames_running_status = status
 
     def close(self):
         """Close the fpe object (namely its socket connection)"""
@@ -289,11 +297,11 @@ class FPE(object):
         hsk = self.cmd_hsk()
         # Create a dictionary of the analogue outputs
         analogue = house_keeping.hsk_to_analogue_dictionary(hsk)
-        # Create array of digital outs
-        digital = house_keeping.hsk_to_digital_dictionary(
-            [k for i in range(0, 128, 32)
+        # Create array of digital outs; this gets wiped every time we
+        # re-upload the register memory so it's not very useful
+        digital = [k for i in range(0, 128, 32)
              for j in hsk[17 + i:24 + i]
-             for k in house_keeping.unpack_pair(j)])
+             for k in house_keeping.unpack_pair(j)]
         return {"analogue": analogue,
                 "digital": digital}
 
@@ -319,7 +327,7 @@ class FPE(object):
 
     @control_status.setter
     def control_status(self, val):
-        "Set the camera control status for the Observatority Simulator for a particular FPE"
+        "Set the camera control status for the Observatory Simulator for a particular FPE"
         self.cmd_control(val)
 
     @property
