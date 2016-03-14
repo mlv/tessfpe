@@ -5,6 +5,9 @@ import os
 import house_keeping
 import binary_files
 
+# Class used for forcing an FPE wrapper to be loaded
+class ForcedWrapperLoad(Exception):
+    pass
 
 def ping():
     """Ping the Observation Simulator to make sure it is alive"""
@@ -16,9 +19,13 @@ def ping():
 
 
 def reverse_bytes32(n):
-    """Reverses the bytes of a 32 bit integer"""
+    """Reverses the bytes of a 32 bit integer
+    :param n: An unsigned 32 bit integer we would like to reverse the bytes of
+    """
+    assert isinstance(n, int), "Argument is not an integer: {}".format(n)
+    assert 0 <= n < 2**32, "Argument must greater than or equal to 0" \
+                           " and less than {MAX}, was {value}".format(MAX=2**32, value=n)
     return reduce(lambda x, i: x + (((n >> 8 * i) & 0xFF) << (8 * (3 - i))), range(4), 0)
-
 
 class FPE(object):
     """An object for interacting with an FPE in an Observatory Simulator"""
@@ -26,9 +33,9 @@ class FPE(object):
     def __init__(self,
                  number,
                  debug=False,
-                 sanity_checks=True):
+                 sanity_checks=True,
+                 auto_load=True):
         from fpesocketconnection import FPESocketConnection
-        from unit_tests import check_house_keeping_voltages
 
         # First sanity check: ping the observatory simulator
         if not ping():
@@ -44,66 +51,90 @@ class FPE(object):
 
         # Second sanity check: check if frames are running, get the observatory simulator version
         original_frames_running_status = None
-        if sanity_checks:
+        if sanity_checks is True:
+            from tessfpe.dhu.unit_tests import check_house_keeping_voltages
+            from tessfpe.dhu.unit_tests import UnexpectedHousekeeping
+            from tessfpe.dhu.fpesocketconnection import TimeOutError
             try:
-                original_frames_running_status = self.frames_running_status
-            except Exception as e:
-                raise type(e)(
-                    "Could not read if frames are running on the Observatory Simulator... {0}\n".format(str(e)) +
-                    "Are you sure the firmware for the Observatory Simulator is properly installed?")
-            try:
-                version = self.version
-                if self._debug:
-                    print version
-            except Exception as e:
-                raise type(e)("Could not read Observatory Simulator version... {0}\n".format(str(e)) +
-                              "Are you sure you firmware for the Observatory Simulator is properly installed?")
-
-        # Run sanity checks on the FPE to make sure basic functions are working (if specified)
-        if sanity_checks:
-            check_house_keeping_voltages(self)
-            if original_frames_running_status is not None:
-                self.frames_running_status = original_frames_running_status
+                try:
+                    original_frames_running_status = self.frames_running_status
+                except Exception as e:
+                    raise type(e)(
+                        "Could not read if frames are running on the Observatory Simulator... {0}\n".format(str(e)) +
+                        "Are you sure the firmware for the Observatory Simulator is properly installed?")
+                try:
+                    version = self.version
+                    if self._debug:
+                        print version
+                except Exception as e:
+                    raise type(e)("Could not read Observatory Simulator version... {0}\n".format(str(e)) +
+                                  "Are you sure you firmware for the Observatory Simulator is properly installed?")
+                try:
+                    check_house_keeping_voltages(self)
+                except (UnexpectedHousekeeping, TimeOutError) as e:
+                    if auto_load is not True:
+                        raise e
+                    else:
+                        self.load_wrapper()
+            finally:
+                if original_frames_running_status is not None:
+                    self.frames_running_status = original_frames_running_status
 
     def load_wrapper(self,
-                     fpe_wrapper_bin=None,
+                     fpe_wrapper_binary=None,
                      wrapper_version='6.1t.5',
-                     force_dhu_reset=False):
+                     force=False,
+                     dhu_reset=False):
         """
         Load an FPGA wrapper.  Checks to see if housekeeping is reporting sane values
-        :param fpe_wrapper_bin:
-        :param wrapper_version:
-        :return:
+        :param fpe_wrapper_binary: A string containing a file name, if None is provided then wrapper_version is used
+        :param wrapper_version: A string containing the version of the wrapper to be used, defaults to '6.1t.5'
+        :param force: A Boolean, which flags whether the wrapper should be (re)installed even if it is already installed
+        :param dhu_reset: A Boolean, which flags whether the DHU should be reset
+        :return: A string saying the status of the loaded wrapper
         """
         import os.path
         from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
         from fpesocketconnection import TimeOutError
-        if fpe_wrapper_bin is None:
-            fpe_wrapper_bin = os.path.join(self._dir, "MemFiles",
+        if fpe_wrapper_binary is None:
+            fpe_wrapper_binary = os.path.join(self._dir, "MemFiles",
                                            "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
-        assert os.path.isfile(fpe_wrapper_bin), "Wrapper does not exist: {}".format(fpe_wrapper_bin)
-        if self.frames_running_status is True:
-            return "Frames are reporting to be running, *NOT* loading wrapper (tried to load {})".format(fpe_wrapper_bin)
+        assert os.path.isfile(fpe_wrapper_binary), "Wrapper does not exist: {}".format(fpe_wrapper_binary)
+        if self.frames_running_status is True\
+                and force is not True\
+                and dhu_reset is not True:
+            return "Frames are reporting to be running, *NOT* loading wrapper (tried to load {})".format(
+                fpe_wrapper_binary)
         try:
+            frames_status = self.frames_running_status
+            if force or dhu_reset:
+                raise ForcedWrapperLoad()
             self.frames_running_status = False
-            self.cmd_hsk(retries=1)
+            self.cam_hsk(retries=1)
             check_house_keeping_voltages(self)
             return "House keeping reports sane values for reference voltages," \
-                   " *NOT* loading wrapper (tried to load {})".format(fpe_wrapper_bin)
-        except (UnexpectedHousekeeping, TimeOutError):
-            self.cmd_rst(upload=False, sanity_checks=False)
-            # assert "Cam FPGA done." in self.cmd_fpga_rst(), "Could not reset the FPGA"
-            assert "Resetting Cam FPGA" in self.cmd_fpga_rst(), "Could not reset the FPGA"
-            assert self.upload_fpe_wrapper_bin(fpe_wrapper_bin), "Could not load wrapper: {}".format(fpe_wrapper_bin)
-            assert self.cmd_rst(upload=True, sanity_checks=False), "Could not reset camera"
+                   " *NOT* loading wrapper (tried to load {})".format(fpe_wrapper_binary)
+        except (ForcedWrapperLoad, UnexpectedHousekeeping, TimeOutError):
+            if dhu_reset is True:
+                self.dhu_reset()
+            self.cam_reset(upload=False, sanity_checks=False)
+            self.cam_fpga_rst()
+            self.upload_fpe_wrapper_bin(fpe_wrapper_binary)
+            # Reset the camera again, which uploads the register memory but doesn't check if housekeeping is sane
+            self.cam_reset(upload=True, sanity_checks=False)
             # Set the housekeeping memory to the identity map
-            assert self.upload_housekeeping_memory(
-                binary_files.write_hskmem(
-                    house_keeping.identity_map)), "Could not load house keeping memory: {}".format(house_keeping_memory)
+            house_keeping_memory = binary_files.write_hskmem(house_keeping.identity_map)
+            assert self.upload_housekeeping_memory(house_keeping_memory), \
+                "Could not load house keeping memory: {}".format(house_keeping_memory)
+            # Reset the camera again, this time checking that housekeeping is reporting sane values
+            self.cam_reset(upload=True, sanity_checks=True)
             # Set the operating parameters to their defaults
-            assert self.ops.reset_to_defaults(), "Could not send operating parameters"
+            assert self.ops.reset_to_defaults(), "Could not send default operating parameters"
+            # Check the house keeping is porting sane values (since we are paranoid)
             check_house_keeping_voltages(self)
             return "Wrapper version {} loaded successfully".format(wrapper_version)
+        finally:
+            self.frames_running_status = frames_status
 
     def close(self):
         """Close the fpe object (namely its socket connection)"""
@@ -151,20 +182,20 @@ class FPE(object):
         finally:
             self.frames_running_status = status
 
-    def cmd_rst(self, upload=True, sanity_checks=True):
+    def cam_reset(self, upload=True, sanity_checks=True):
         """Reset the camera after running frames"""
         from unit_tests import check_house_keeping_voltages
         if self._reset_in_progress:
             return False
         self._reset_in_progress = True
-        self.cmd_stop_frames()
+        self.cam_stop_frames()
         assert 'FPE Reset complete' in self.connection.send_command(
             'camrst',
             reply_pattern='FPE Reset complete'), "Could not successfully issue camera reset command"
         # Clear cam_control
         self.control_status = 1
         status = self.control_status
-        assert status is 0, "camera control status memory could not zeroed, was {}".format(hex(status))
+        assert status is 0, "camera control status memory could not zeroed, was 0x{}".format(hex(status))
         if sanity_checks or upload:
             register_memory = os.path.join(self._dir, 'MemFiles', 'Reg.bin')
             assert self.upload_register_memory(register_memory), \
@@ -174,21 +205,25 @@ class FPE(object):
         self._reset_in_progress = False
         return True
 
-    def cmd_status(self):
+    def cam_rst(self, upload=True, sanity_checks=True):
+        """Reset the camera after running frames"""
+        return self.cam_reset(upload=upload, sanity_checks=sanity_checks)
+
+    def cam_status(self):
         """Get the camera status"""
         response = self.connection.send_command(
             "cam_status",
             reply_pattern="cam_status = 0x[0-9a-f]+")[13:]
         return int(response, 16)
 
-    def cmd_control(self, val=None):
+    def cam_control(self, val=None):
         """Get the camera control status"""
         response = self.connection.send_command(
             "cam_control" if val is None else "cam_control = {}".format(val),
             reply_pattern="cam_control = 0x[0-9a-f]+")[14:]
         return int(response, 16)
 
-    def cmd_version(self):
+    def cam_version(self):
         """Get the version of the Observatory Simulator DHU software"""
         import re
         # Frames must be stopped to read version, otherwise the observatory simulator will not respond
@@ -203,9 +238,9 @@ class FPE(object):
         finally:
             self.frames_running_status = status
 
-    def cmd_fpga_rst(self):
+    def cam_fpga_reset(self):
         """Reset the FPGA so that another wrapper can be uploaded"""
-        assert self.cmd_rst(upload=False, sanity_checks=False), "Could not reset camera"
+        assert self.cam_reset(upload=False, sanity_checks=False), "Could not reset camera"
         return self.connection.send_command(
             "cam_fpga_rst",
             # TODO: switch on "Cam FPGA done."
@@ -213,28 +248,53 @@ class FPE(object):
             timeout=3
         )
 
-    def cmd_start_frames(self):
+    def dhu_reset(self):
+        """Reset the DHU; note that this clobbers *both* cameras attached"""
+        return self.connection.send_command(
+            "dhu_rst",
+            reply_pattern="DHU Reset complete",
+            timeout=3
+        )
+
+    def dhu_rst(self):
+        """Reset the DHU; note that this clobbers *both* cameras attached"""
+        return self.dhu_reset()
+
+    def cam_fpga_rst(self):
+        """Reset the FPGA so that another wrapper can be uploaded"""
+        return self.cam_fpga_rst()
+
+    def cam_start_frames(self, auto_load=True):
         """Start running frames"""
+        from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
+        from fpesocketconnection import TimeOutError
         if self.frames_running_status is True:
             return "Control status indicates frames are already running"
+        try:
+            check_house_keeping_voltages(self)
+        except (UnexpectedHousekeeping, TimeOutError):
+            # If auto load is set, try to automatically upload the wrapper if house_keeping isn't sane
+            if auto_load is True:
+                self.load_wrapper()
         return self.connection.send_command(
             "cam_start_frames",
             reply_pattern="(Starting frames...|Frames already enabled)"
         )
 
-    def cmd_stop_frames(self):
+    def cam_stop_frames(self):
         """Stop running frames"""
         if self.frames_running_status is False:
             return "Control status indicates frames are already stopped;" \
-                   " however the FPE may not be safely in debug mode"
+                   " however the FPE may not be safely in debug mode" \
+                   " if cam_stop_frames was issued via the netcat console"
         assert "Frames Stopped..." in self.connection.send_command(
             "cam_stop_frames",
             reply_pattern="Frames Stopped...")
-        self.cmd_rst()
+        self.cam_reset()
         assert self._reset_in_progress is False, "Reset should no longer be in progress"
         return "Frames have been stopped and the FPE has been placed in debug mode"
 
-    def cmd_hsk(self, retries=None):
+    def cam_hsk(self, retries=None):
         """Get the camera housekeeping data, outputs an array of the housekeeping data"""
         import re
         channels = 128
@@ -252,7 +312,7 @@ class FPE(object):
         finally:
             self.frames_running_status = status
 
-    def cmd_clv(self):
+    def cam_clv(self):
         """Get the clock voltage memory, returns the twelve bit values"""
         import re
         entries = 64
@@ -280,55 +340,44 @@ class FPE(object):
         program_byte_code = binary_files.write_prgmem(compile_programs(ast))
         return self.upload_sequencer_memory(sequencer_byte_code) and self.upload_program_memory(program_byte_code)
 
-    def capture_frames(self, n):
-        """Capture frames"""
-        import subprocess
-        import os.path
-        self.cmd_start_frames()
-        proc = subprocess.Popen(
-            [os.path.join(self._dir, "..", "fits_capture", "tess_obssim", "tess_obssim"), '-n', str(n)],
-            shell=False)
-        proc.communicate()
-        self.cmd_stop_frames()
-
     @property
     def house_keeping(self):
         """Return the house keeping as a map"""
-        hsk = self.cmd_hsk()
+        hsk = self.cam_hsk()
         # Create a dictionary of the analogue outputs
         analogue = house_keeping.hsk_to_analogue_dictionary(hsk)
         # Create array of digital outs; this gets wiped every time we
         # re-upload the register memory so it's not very useful
         digital = [k for i in range(0, 128, 32)
-             for j in hsk[17 + i:24 + i]
-             for k in house_keeping.unpack_pair(j)]
+                   for j in hsk[17 + i:24 + i]
+                   for k in house_keeping.unpack_pair(j)]
         return {"analogue": analogue,
                 "digital": digital}
 
     @property
     def analogue_house_keeping_with_units(self):
-        hsk = self.cmd_hsk()
+        hsk = self.cam_hsk()
         return house_keeping.hsk_to_analogue_dictionary_with_units(hsk)
 
     @property
     def version(self):
         """Version property for the Observatory Simulator DHU software"""
-        return self.cmd_version()
+        return self.cam_version()
 
     @property
     def status(self):
         """Get the camera status for the Observatory Simulator for a particular FPE"""
-        return self.cmd_status()
+        return self.cam_status()
 
     @property
     def control_status(self):
         """Get the camera control status for the Observatory Simulator for a particular FPE"""
-        return self.cmd_control()
+        return self.cam_control()
 
     @control_status.setter
     def control_status(self, val):
-        "Set the camera control status for the Observatory Simulator for a particular FPE"
-        self.cmd_control(val)
+        """Set the camera control status for the Observatory Simulator for a particular FPE"""
+        self.cam_control(val)
 
     @property
     def expected_housekeeping(self):
@@ -346,6 +395,7 @@ class FPE(object):
             expected_values[v] = temperature_sensor_calibration_values[v]
         return expected_values
 
+
     @property
     def ops(self):
         if self._ops is None:
@@ -354,7 +404,7 @@ class FPE(object):
 
     @property
     def frames_running_status(self):
-        """Check if frames are being run or not"""
+        """Status of whether the Observatory Simulator server is running frames."""
         return (0b10 & self.control_status) == 0b10
 
     @frames_running_status.setter
@@ -363,14 +413,16 @@ class FPE(object):
         if value is self.frames_running_status:
             pass
         elif value is True and self.frames_running_status is not True:
-            self.cmd_start_frames()
+            self.cam_start_frames()
         elif value is False and self.frames_running_status is not False:
-            self.cmd_stop_frames()
+            self.cam_stop_frames()
         else:
             raise Exception("Trying to set frames_running_status to value that is not boolean: {0}".format(value))
 
     def upload_fpe_wrapper_bin(self, fpe_wrapper_bin):
-        """Upload the FPE Wrapper binary file to the FPE"""
+        """Upload the FPE Wrapper binary file to the FPE
+        :param fpe_wrapper_bin: Name of FPE wrapper binary to upload
+        """
         return self.tftp_put(
             fpe_wrapper_bin,
             "bitmem" + str(self.fpe_number))

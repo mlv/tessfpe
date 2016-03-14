@@ -12,24 +12,33 @@ FPE_Wrapper_versions = ['6.1.1', '6.0.5772', '6.1t.1', '6.1.4', '6.1t.4', '6.1.5
 
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
-    from tessfpe.dhu.unit_tests import check_house_keeping_voltages, check_hk
     from termcolor import colored
     import argparse
     import sys
 
+    default_binary_version = "6.1t.5"
+
     parser = argparse.ArgumentParser(description='Load the FPE wrapper')
-    parser.add_argument('wrapper_version', type=str,
+    parser.add_argument('fpe_wrapper_binary', nargs='?', type=str, default=None,
+                        help="Name of a specified binary file to upload; if none specified defaults to uploading "
+                             "the version: {version}".format(version=default_binary_version))
+    parser.add_argument('--version', type=str, default=default_binary_version,
                         help="The version of the wrapper to load.  Must be one of either {0}, or {1}".format(
                             ", ".join(FPE_Wrapper_versions[:-1]), FPE_Wrapper_versions[-1]))
+    parser.add_argument('--version', type=str, )
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--debug', action='store_true', help='Enable debugging output')
+    parser.add_argument('--force', action='store_true', help='Force (re)load the wrapper')
+    parser.add_argument('--dhu-reset', action='store_true', help='Reset the DHU before loading')
     args = parser.parse_args()
     try:
-        assert args.wrapper_version in FPE_Wrapper_versions, "FPE Wrapper version must be one of {0} (was set to '{1}')".format(
-            FPE_Wrapper_versions, args.wrapper_version)
+        if args.fpe_wrapper_binary is not None:
+            assert args.version in FPE_Wrapper_versions, \
+                "FPE Wrapper version must be one of {0} (was set to '{1}')".format(
+                    FPE_Wrapper_versions, args.wrapper_version)
         with FPE(args.FPE_number, debug=args.debug, sanity_checks=False) as fpe:
             print u"{1} {0}".format(colored("ok", 'green'),
-                                    fpe.load_wrapper(args.wrapper_version))
+                                    fpe.load_wrapper(args.wrapper_version, force=args.force, dhu_reset=args.dhu_reset))
             sys.exit(0)
     except Exception as e:
         if args.debug:

@@ -301,7 +301,7 @@ class OperatingParameters(dict):
 
     def set_values_from_fpe(self):
         """Get the operating parameters from the FPE and set them"""
-        for idx, val in enumerate(self._fpe.cmd_clv()):
+        for idx, val in enumerate(self._fpe.cam_clv()):
             if self.address[idx]:
                 self.address[idx].twelve_bit_value = val
         return self
@@ -348,17 +348,18 @@ class OperatingParameters(dict):
         """Send the current DAC values to the hardware."""
         # Get the frames status, restore it after we are done uploading the operating parameters
         frames_status = self._fpe.frames_running_status
-        self._fpe.cmd_stop_frames()
+        self._fpe.cam_stop_frames()
         try:
             return self._fpe.upload_operating_parameter_memory(
                 self.write_clvmem())
         finally:
-            self._fpe.frames_running_status = frames_status
             new_parameters = OperatingParameters(self._fpe)
             if self != new_parameters:
+                self._fpe.frames_running_status = frames_status
                 raise Exception("Could not set operating parameters")
             else:
                 self.set_values_from_fpe()
+                self._fpe.frames_running_status = frames_status
 
     def reset_to_defaults(self):
         """Reset the operating parameters to the defaults"""
