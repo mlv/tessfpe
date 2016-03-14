@@ -33,7 +33,8 @@ class FPE(object):
     def __init__(self,
                  number,
                  debug=False,
-                 sanity_checks=True):
+                 sanity_checks=True,
+                 auto_load=True):
         from fpesocketconnection import FPESocketConnection
 
         # First sanity check: ping the observatory simulator
@@ -49,15 +50,15 @@ class FPE(object):
         # self.ops implemented with lazy getter
         self._ops = None
 
-        # Second sanity check: check if frames are running, get the observatory simulator version
-        original_frames_running_status = None
+        frames_status = None
         if sanity_checks is True:
             from tessfpe.dhu.unit_tests import check_house_keeping_voltages
             from tessfpe.dhu.unit_tests import UnexpectedHousekeeping
             from tessfpe.dhu.fpesocketconnection import TimeOutError
             try:
                 try:
-                    original_frames_running_status = self.frames_running_status
+                    frames_status = self.frames_running_status
+                    assert frames_status is True or frames_status is False
                 except Exception as e:
                     raise type(e)(
                         "Could not read if frames are running on the Observatory Simulator... {0}\n".format(str(e)) +
@@ -69,10 +70,18 @@ class FPE(object):
                 except Exception as e:
                     raise type(e)("Could not read Observatory Simulator version... {0}\n".format(str(e)) +
                                   "Are you sure you firmware for the Observatory Simulator is properly installed?")
-                check_house_keeping_voltages(self)
+                if frames_status is not True:
+                    try:
+                        check_house_keeping_voltages(self)
+                    except (UnexpectedHousekeeping, TimeOutError) as e:
+                        if auto_load is True:
+                            self.load_wrapper()
+                        else:
+                            raise e
+
             finally:
-                if original_frames_running_status is not None:
-                    self.frames_running_status = original_frames_running_status
+                if frames_status is not None:
+                    self.frames_running_status = frames_status
 
     def load_wrapper(self,
                      fpe_wrapper_binary=None,
@@ -261,15 +270,15 @@ class FPE(object):
             timeout=3
         )
 
+    def cam_fpga_rst(self):
+        """Reset the FPGA so that another wrapper can be uploaded"""
+        return self.cam_fpga_reset()
+
     def dhu_rst(self):
         """Reset the DHU; note that this clobbers *both* cameras attached"""
         return self.dhu_reset()
 
-    def cam_fpga_rst(self):
-        """Reset the FPGA so that another wrapper can be uploaded"""
-        return self.cam_fpga_rst()
-
-    def cam_start_frames(self, auto_load=True):
+    def cam_start_frames(self):
         """Start running frames"""
         if self.frames_running_status is True:
             return "Control status indicates frames are already running"
