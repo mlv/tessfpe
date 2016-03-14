@@ -2,10 +2,11 @@
 """This script checks if the Observatory simulator is running frames or not"""
 
 if __name__ == "__main__":
+    from termcolor import colored
     from tessfpe.dhu.fpe import FPE
-    from tessfpe.dhu.unit_tests import check_house_keeping_voltages
     import sys
     import argparse
+
     parser = argparse.ArgumentParser(description='Get the status of whether the frames are running or not')
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--check-running', action='store_true', help='Check that frames are running')
@@ -17,15 +18,21 @@ if __name__ == "__main__":
 
     with FPE(args.FPE_number) as fpe:
         if fpe.frames_running_status:
-            print "Frames are running"
             if args.check_running is True:
+                print "Frames are running {0}".format(colored("ok", 'green'))
                 sys.exit(0)
             if args.check_not_running is True:
+                print >> sys.stderr, colored(u"{1} {0}".format("X", "Frames are running when they should not"), 'red',
+                                             attrs=['bold'])
                 sys.exit(1)
+            print "Frames are running",
         else:
-            print "Frames are not running"
             if args.check_running is True:
+                print >> sys.stderr, colored(u"{1} {0}".format("X", "Frames are *NOT* running when they should"), 'red',
+                                             attrs=['bold'])
                 sys.exit(1)
             if args.check_not_running is True:
+                print "Frames are not running {0}".format(colored("ok", 'green'))
                 sys.exit(0)
+            print "Frames are not running",
     sys.exit(0)
