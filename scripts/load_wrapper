@@ -22,7 +22,7 @@ if __name__ == "__main__":
     parser.add_argument('fpe_wrapper_binary', nargs='?', type=str, default=None,
                         help="Name of a specified binary file to upload; if none specified defaults to uploading "
                              "the version: {version}".format(version=default_binary_version))
-    parser.add_argument('--version', type=str, default=default_binary_version,
+    parser.add_argument('--wrapper-version', type=str, default=default_binary_version,
                         help="The version of the wrapper to load.  Must be one of either {0}, or {1}".format(
                             ", ".join(FPE_Wrapper_versions[:-1]), FPE_Wrapper_versions[-1]))
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
@@ -32,12 +32,16 @@ if __name__ == "__main__":
     args = parser.parse_args()
     try:
         if args.fpe_wrapper_binary is not None:
-            assert args.version in FPE_Wrapper_versions, \
+            assert args.wrapper_version in FPE_Wrapper_versions, \
                 "FPE Wrapper version must be one of {0} (was set to '{1}')".format(
                     FPE_Wrapper_versions, args.wrapper_version)
         with FPE(args.FPE_number, debug=args.debug, sanity_checks=False) as fpe:
             print u"{1} {0}".format(colored("ok", 'green'),
-                                    fpe.load_wrapper(args.wrapper_version, force=args.force, dhu_reset=args.dhu_reset))
+                                    fpe.load_wrapper(
+                                        fpe_wrapper_binary=args.fpe_wrapper_binary,
+                                        vwrapper_version = args.wrapper_version, 
+                                        force=args.force, 
+                                        dhu_reset=args.dhu_reset))
             sys.exit(0)
     except Exception as e:
         if args.debug:

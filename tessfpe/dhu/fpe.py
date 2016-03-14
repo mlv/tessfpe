@@ -87,6 +87,7 @@ class FPE(object):
                      dhu_reset=False):
         """
         Load an FPGA wrapper.  Checks to see if housekeeping is reporting sane values
+        :type wrapper_version: str
         :param fpe_wrapper_binary: A string containing a file name, if None is provided then wrapper_version is used
         :param wrapper_version: A string containing the version of the wrapper to be used, defaults to '6.1t.5'
         :param force: A Boolean, which flags whether the wrapper should be (re)installed even if it is already installed
