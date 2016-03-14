@@ -39,7 +39,7 @@ if __name__ == "__main__":
             print u"{1} {0}".format(colored("ok", 'green'),
                                     fpe.load_wrapper(
                                         fpe_wrapper_binary=args.fpe_wrapper_binary,
-                                        vwrapper_version = args.wrapper_version, 
+                                        wrapper_version = args.wrapper_version,
                                         force=args.force, 
                                         dhu_reset=args.dhu_reset))
             sys.exit(0)
