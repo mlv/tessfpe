@@ -25,7 +25,6 @@ if __name__ == "__main__":
     parser.add_argument('--version', type=str, default=default_binary_version,
                         help="The version of the wrapper to load.  Must be one of either {0}, or {1}".format(
                             ", ".join(FPE_Wrapper_versions[:-1]), FPE_Wrapper_versions[-1]))
-    parser.add_argument('--version', type=str, )
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--debug', action='store_true', help='Enable debugging output')
     parser.add_argument('--force', action='store_true', help='Force (re)load the wrapper')
