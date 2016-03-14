@@ -33,8 +33,7 @@ class FPE(object):
     def __init__(self,
                  number,
                  debug=False,
-                 sanity_checks=True,
-                 auto_load=True):
+                 sanity_checks=True):
         from fpesocketconnection import FPESocketConnection
 
         # First sanity check: ping the observatory simulator
@@ -70,13 +69,7 @@ class FPE(object):
                 except Exception as e:
                     raise type(e)("Could not read Observatory Simulator version... {0}\n".format(str(e)) +
                                   "Are you sure you firmware for the Observatory Simulator is properly installed?")
-                try:
-                    check_house_keeping_voltages(self)
-                except (UnexpectedHousekeeping, TimeOutError) as e:
-                    if auto_load is not True:
-                        raise e
-                    else:
-                        self.load_wrapper()
+                check_house_keeping_voltages(self)
             finally:
                 if original_frames_running_status is not None:
                     self.frames_running_status = original_frames_running_status
@@ -144,9 +137,9 @@ class FPE(object):
             # Check the house keeping is porting sane values (since we are paranoid)
             check_house_keeping_voltages(self)
             return "Wrapper version {} loaded successfully".format(wrapper_version)
-        finally:
-            self.frames_running_status = frames_status
-            self._loading_wrapper = False
+        # finally:
+        #     self.frames_running_status = frames_status
+        #     self._loading_wrapper = False
 
     def close(self):
         """Close the fpe object (namely its socket connection)"""
@@ -278,16 +271,8 @@ class FPE(object):
 
     def cam_start_frames(self, auto_load=True):
         """Start running frames"""
-        from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
-        from fpesocketconnection import TimeOutError
         if self.frames_running_status is True:
             return "Control status indicates frames are already running"
-        # try:
-        #     check_house_keeping_voltages(self)
-        # except (UnexpectedHousekeeping, TimeOutError):
-        #     # If auto load is set, try to automatically upload the wrapper if house_keeping isn't sane
-        #     if auto_load is True:
-        #         self.load_wrapper()
         return self.connection.send_command(
             "cam_start_frames",
             reply_pattern="(Starting frames...|Frames already enabled)"
