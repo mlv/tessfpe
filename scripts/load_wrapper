@@ -21,7 +21,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Load the FPE wrapper')
     parser.add_argument('fpe_wrapper_binary', nargs='?', type=str, default=None,
                         help="Name of a specified binary file to upload; if none specified defaults to uploading "
-                             "the version: {version}".format(version=default_binary_version))
+                             "the version: '{version}'. If a known version is specified instead of a file, "
+                             "that version will be used".format(version=default_binary_version))
     parser.add_argument('--wrapper-version', type=str, default=default_binary_version,
                         help="The version of the wrapper to load.  Must be one of either {0}, or {1}".format(
                             ", ".join(FPE_Wrapper_versions[:-1]), FPE_Wrapper_versions[-1]))
