@@ -89,7 +89,7 @@ if __name__ == "__main__":
     parser.add_argument('--steps', metavar='N', type=int, nargs='?', default=100,
                         help='The number of steps to take as the operating parameter is walked from its low value '
                              'to its high value (default is 100)')
-    parser.add_argument('--steps-size', metavar='N', type=int, nargs='?', default=None,
+    parser.add_argument('--step-size', metavar='N', type=int, nargs='?', default=None,
                         help="The size of a step to take as the operating parameter is walked from its low value "
                              "to its high value; overrides '--steps'")
     parser.add_argument('--samples-per-step', metavar='N', type=int, nargs='?', default=5,
