@@ -20,14 +20,6 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
     # Flatten measurements data into something less natural for matplotlib...
     if filename is None:
         filename = parameter_name + ".pdf"
-    _, extension = os.path.splitext(filename)
-    if "pdf" not in extension:
-        filename += ".pdf"
-    basename, _ = os.path.splitext(filename)
-    count = 0
-    while os.path.exists(filename):
-        filename = "{basename}.{count}.pdf".format(basename=basename, count=count)
-        count += 1
     with PdfPages(filename) as pdf:
         x = [k for k in measurement_data
              for _ in measurement_data[k]]
@@ -48,17 +40,22 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         calculated_step_size = sorted_keys[1] - sorted_keys[0]
         samples_per_step = len(measurement_data[measurement_data.keys()[0]])
         pdf_information = pdf.infodict()
-        pdf_information['Title'] = "Plot of {parameter_name}".format(parameter_name=parameter_name)
-        pdf_information['Parameter'] = parameter_name
-        pdf_information['Minimum'] = min(x)
-        pdf_information['Maximum'] = max(x)
-        pdf_information['StepSize'] = calculated_step_size
-        pdf_information['SamplesPerStep'] = samples_per_step
-        pdf_information['CreationDate'] = datetime.datetime.today()
-        pdf.savefig()
-        plt.close()
-    return filename
+        pdf_information['Title'] = "Plot of {parameter_name}, "
+        "from a minimum value of {min_value} "
+        "to a maximum value of {max_value} "
+        "with a step size of {step_size} "
+        "with {samples_per_step} samples per step".format(
+            parameter_name=parameter_name,
+            minimum_value=min(x),
+            maximum_value=max(x),
+            step_size=calculated_step_size,
+            samples_per_step=samples_per_step)
+    pdf_information['CreationDate'] = datetime.datetime.today()
+    pdf.savefig()
+    plt.close()
 
+
+return filename
 
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
