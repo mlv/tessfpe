@@ -21,7 +21,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
     if filename is None:
         filename = parameter_name + ".pdf"
     _, extension = os.path.splitext(filename)
-    if extension is not ".pdf":
+    if "pdf" not in extension:
         filename += ".pdf"
     basename, _ = os.path.splitext(filename)
     count = 0
