@@ -50,12 +50,10 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
             maximum_value=max(x),
             step_size=calculated_step_size,
             samples_per_step=samples_per_step)
-    pdf_information['CreationDate'] = datetime.datetime.today()
-    pdf.savefig()
-    plt.close()
-
-
-return filename
+        pdf_information['CreationDate'] = datetime.datetime.today()
+        pdf.savefig()
+        plt.close()
+    return filename
 
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
