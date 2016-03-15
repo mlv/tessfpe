@@ -369,14 +369,6 @@ class OperatingParameters(dict):
             a.value = a.default
         return self.send()
 
-    def reset_to_low(self):
-        """Reset the operating parameters to the low values"""
-        for a in self.address:
-            if a is None:
-                continue
-            a.value = a.low
-        return self.send()
-
 
 if __name__ == "__main__":
     import doctest
