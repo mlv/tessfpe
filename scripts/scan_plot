@@ -47,15 +47,6 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         sorted_keys = list(sorted(measurements.keys()))
         calculated_step_size = sorted_keys[1] - sorted_keys[0]
         samples_per_step = len(measurement_data[measurement_data.keys()[0]])
-        pdf.attach_node("Plot of {parameter_name}, "
-                        "from a minimum value of {min_value} "
-                        "to a maximum value of {max_value} "
-                        "with a step size of {step_size} "
-                        "with {samples_per_step} samples per step".format(parameter_name=parameter_name,
-                                                                          minimum_value=min(x),
-                                                                          maximum_value=max(x),
-                                                                          step_size=calculated_step_size,
-                                                                          samples_per_step=samples_per_step))
         pdf_information = pdf.infodict()
         pdf_information['Title'] = "Plot of {parameter_name}".format(parameter_name=parameter_name)
         pdf_information['Parameter'] = parameter_name
