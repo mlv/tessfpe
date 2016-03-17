@@ -58,7 +58,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
             step_size=calculated_step_size,
             samples_per_step=samples_per_step
         )
-        plt.xlabel(info_text)
+        plt.text(0, 0, info_text)
         # Makes some assumptions about measurement_data, be careful!
         pdf_information = pdf.infodict()
         pdf_information['Title'] = parameter_name
