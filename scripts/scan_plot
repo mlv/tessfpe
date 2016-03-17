@@ -49,7 +49,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
                    'Minimum value: {minimum_value}\n' \
                    'Maximum value: {maximum_value}\n' \
                    'Step size: {step_size}\n' \
-                   'Samples per step: {samples_per_step'.format(
+                   'Samples per step: {samples_per_step}'.format(
             parameter_name=parameter_name,
             minimum_value=min(x),
             maximum_value=max(x),
