@@ -145,7 +145,7 @@ class FPE(object):
             assert self.ops.reset_to_defaults(), "Could not send default operating parameters"
             # Check the house keeping is porting sane values (since we are paranoid)
             check_house_keeping_voltages(self)
-            return "Wrapper version {} loaded successfully".format(wrapper_version)
+            return "Wrapper {} loaded successfully".format(fpe_wrapper_binary)
         # finally:
         #     self.frames_running_status = frames_status
         #     self._loading_wrapper = False
