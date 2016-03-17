@@ -30,7 +30,6 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         raise Exception("File name exists: '{filename}' ; please make a backup and try again".format(
             filename=filename))
     with PdfPages(filename) as pdf:
-        plt.tight_layout()
         x = [k for k in measurement_data
              for _ in measurement_data[k]]
         y = [d for k in measurement_data
@@ -67,6 +66,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         pdf_information['Title'] = parameter_name
         pdf_information['Subject'] = info_text
         pdf_information['CreationDate'] = datetime.datetime.today()
+        plt.tight_layout()
         pdf.savefig()
         plt.close()
     return filename
