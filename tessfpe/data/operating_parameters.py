@@ -32,6 +32,8 @@ default_operating_parameters = \
           "low": entry["low"],
           "high": entry["high"],
           "unit": entry["unit"],
+          "range_low": entry["range_low"],
+          "range_high": entry["range_high"],
           "relative_to": 'ccd' + ccd + '_' + entry["relative_to"] if entry["relative_to"] is not None else None,
           "default": entry["default"]}
      for address_offset, ccd, group in read_data_tsv("HKmap.tsv")
