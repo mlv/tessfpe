@@ -16,8 +16,8 @@ def get_operating_parameters(tsv_file_name):
                 {"address_offset": int(line[0]),
                  "low": float(line[4]),
                  "high": float(line[5]),
-                 "range_low": float(line[6]),
-                 "range_high": float(line[7]),
+                 "range_low": float(line[6] if line[6] is not '' else line[4]),
+                 "range_high": float(line[7] if line[7] is not '' else line[5]),
                  "unit": line[8],
                  "relative_to": line[9].lower().replace(' ', '_') if line[9] is not '' else None,
                  "default": defaults[line[1]]}
