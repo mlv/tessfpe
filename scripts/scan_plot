@@ -3,13 +3,15 @@
 Scans a particular operating parameter across its range of values and writs a plot to a file
 """
 
+class FileNameExists(Exception):
+    pass
 
 def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
     """
     Plot measurements to a file
     :param parameter_name: The name of the parameter being measure
     :param measurement_data: A dictionary of parameter set values and measurements
-    :param filename: An optional filename to write to
+    :param filename: An optional filename or directory name to write to
     :return: The name of the filename the plot was written to
     """
     import matplotlib.pyplot as plt
@@ -18,8 +20,13 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
     import datetime
     import os.path
     # Flatten measurements data into something less natural for matplotlib...
+    if os.path.isdir(filename):
+        filename = os.path.join(filename, parameter_name + ".pdf")
     if filename is None:
         filename = parameter_name + ".pdf"
+    if os.path.isfile(filename):
+        raise Exception("File name exists: '{filename}' ; please make a backup and try again".format(
+            filename=filename))
     with PdfPages(filename) as pdf:
         x = [k for k in measurement_data
              for _ in measurement_data[k]]
@@ -39,8 +46,8 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         calculated_step_size = sorted_keys[1] - sorted_keys[0]
         samples_per_step = len(measurement_data[measurement_data.keys()[0]])
         info_text= 'Parameter: {parameter_name}\n' \
-                   'Minimum value: {min_value}\n' \
-                   'Maximum value: {max_value}\n' \
+                   'Minimum value: {minimum_value}\n' \
+                   'Maximum value: {maximum_value}\n' \
                    'Step size: {step_size}\n' \
                    'Samples per step: {samples_per_step'.format(
             parameter_name=parameter_name,
@@ -74,7 +81,7 @@ if __name__ == "__main__":
                              " defaults to the highest possible value the parameter can be")
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--output', type=str, nargs='?', default=None,
-                        help="The file where the of the results should be output; defaults to "
+                        help="The file or directory where the of the results should be output; defaults to "
                              "<parameter>.pdf or <parameter>.<number>.pdf")
     parser.add_argument('--steps', metavar='N', type=int, nargs='?', default=100,
                         help='The number of steps to take as the operating parameter is walked from its low value '
