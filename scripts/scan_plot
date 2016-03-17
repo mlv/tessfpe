@@ -60,13 +60,13 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
             step_size=calculated_step_size,
             samples_per_step=samples_per_step
         )
-        plt.text(min_value, min_value - 4, info_text)
+        plt.text(min_value, min_value - 2, info_text)
         # Makes some assumptions about measurement_data, be careful!
         pdf_information = pdf.infodict()
         pdf_information['Title'] = parameter_name
         pdf_information['Subject'] = info_text
         pdf_information['CreationDate'] = datetime.datetime.today()
-        plt.subplots_adjust(bottom=5)
+        plt.subplots_adjust(bottom=min_value-4)
         pdf.savefig()
         plt.close()
     return filename
