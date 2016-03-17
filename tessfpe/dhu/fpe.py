@@ -5,9 +5,11 @@ import os
 import house_keeping
 import binary_files
 
+
 # Class used for forcing an FPE wrapper to be loaded
 class ForcedWrapperLoad(Exception):
     pass
+
 
 def ping():
     """Ping the Observation Simulator to make sure it is alive"""
@@ -23,9 +25,10 @@ def reverse_bytes32(n):
     :param n: An unsigned 32 bit integer we would like to reverse the bytes of
     """
     assert isinstance(n, int), "Argument is not an integer: {}".format(n)
-    assert 0 <= n < 2**32, "Argument must greater than or equal to 0" \
-                           " and less than {MAX}, was {value}".format(MAX=2**32, value=n)
+    assert 0 <= n < 2 ** 32, "Argument must greater than or equal to 0" \
+                             " and less than {MAX}, was {value}".format(MAX=2 ** 32, value=n)
     return reduce(lambda x, i: x + (((n >> 8 * i) & 0xFF) << (8 * (3 - i))), range(4), 0)
+
 
 class FPE(object):
     """An object for interacting with an FPE in an Observatory Simulator"""
@@ -52,9 +55,9 @@ class FPE(object):
 
         frames_status = None
         if sanity_checks is True:
-            from tessfpe.dhu.unit_tests import check_house_keeping_voltages
-            from tessfpe.dhu.unit_tests import UnexpectedHousekeeping
-            from tessfpe.dhu.fpesocketconnection import TimeOutError
+            from unit_tests import check_house_keeping_voltages
+            from unit_tests import UnexpectedHousekeeping
+            from fpesocketconnection import TimeOutError
             try:
                 try:
                     frames_status = self.frames_running_status
@@ -85,7 +88,7 @@ class FPE(object):
 
     def load_wrapper(self,
                      fpe_wrapper_binary=None,
-                     wrapper_version='6.1t.5',
+                     wrapper_version='6.2.3',
                      force=False,
                      dhu_reset=False):
         """
@@ -107,16 +110,16 @@ class FPE(object):
             frames_status = self.frames_running_status
             if fpe_wrapper_binary is None:
                 fpe_wrapper_binary = os.path.join(self._dir, "MemFiles",
-                                               "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
+                                                  "FPE_Wrapper-{version}.bin".format(version=wrapper_version))
             if not os.path.isfile(fpe_wrapper_binary):
                 # Maybe we specified a version instead of a real file? No harm in trying...
                 file_name = os.path.join(self._dir, "MemFiles",
-                                               "FPE_Wrapper-{version}.bin".format(version=fpe_wrapper_binary))
+                                         "FPE_Wrapper-{version}.bin".format(version=fpe_wrapper_binary))
                 if os.path.isfile(file_name):
                     fpe_wrapper_binary = file_name
             assert os.path.isfile(fpe_wrapper_binary), "Wrapper file '{}' does not exist".format(fpe_wrapper_binary)
-            if self.frames_running_status is True\
-                    and force is not True\
+            if self.frames_running_status is True \
+                    and force is not True \
                     and dhu_reset is not True:
                 return "Frames are reporting to be running, *NOT* loading wrapper (tried to load '{}')".format(
                     fpe_wrapper_binary)
@@ -140,7 +143,7 @@ class FPE(object):
             assert self.upload_housekeeping_memory(house_keeping_memory), \
                 "Could not load house keeping memory: {}".format(house_keeping_memory)
             # Reset the camera again, this time checking that housekeeping is reporting sane values
-            #self.cam_reset(upload=True, sanity_checks=True)
+            # self.cam_reset(upload=True, sanity_checks=True)
             # Set the operating parameters to their defaults
             assert self.ops.reset_to_defaults(), "Could not send default operating parameters"
             # Check the house keeping is porting sane values (since we are paranoid)
@@ -400,7 +403,6 @@ class FPE(object):
         for v in temperature_sensor_calibration_values:
             expected_values[v] = temperature_sensor_calibration_values[v]
         return expected_values
-
 
     @property
     def ops(self):
