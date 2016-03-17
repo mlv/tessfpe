@@ -60,7 +60,8 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
             step_size=calculated_step_size,
             samples_per_step=samples_per_step
         )
-        plt.text(min_value, max_value, info_text,
+        offset = float(max_value - min_value) / 20.0
+        plt.text(min_value + offset, max_value - offset, info_text,
                  family='monospace',
                  horizontalalignment='left',
                  verticalalignment='top')
