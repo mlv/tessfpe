@@ -174,7 +174,8 @@ class OperatingParameter(object):
         actual_high = self.high
         if actual_high <= actual_low:
             (actual_low, actual_high) = (actual_high, actual_low)
-        if not (actual_low <= x <= actual_high):
+        epsilon = 10**-5
+        if not (actual_low - epsilon <= x <= actual_high + epsilon):
             raise Exception("Attempting to set value out of bounds.\n" +
                             "value: {}\n".format(x) +
                             "name: {}\n".format(self.name) +
