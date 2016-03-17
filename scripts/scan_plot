@@ -66,7 +66,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         pdf_information['Title'] = parameter_name
         pdf_information['Subject'] = info_text
         pdf_information['CreationDate'] = datetime.datetime.today()
-        plt.tight_layout()
+        plt.subplots_adjust(bottom=5)
         pdf.savefig()
         plt.close()
     return filename
