@@ -76,10 +76,10 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description='Scan an operating parameter and plot the result to a file')
     parser.add_argument('parameter', type=str, help="The name of the operating parameter to scan")
-    parser.add_argument('low_value', type=float, nargs='?', default=float('NaN'),
+    parser.add_argument('low_value', type=float, nargs='?', default=None,
                         help="The low value to start the scan at, "
                              "defaults to the lowest possible value the parameter can be")
-    parser.add_argument('high_value', type=float, nargs='?', default=float('NaN'),
+    parser.add_argument('high_value', type=float, nargs='?', default=None,
                         help="The high value to stop the scan at,"
                              " defaults to the highest possible value the parameter can be")
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
@@ -101,8 +101,6 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     parameter = args.parameter
-    step_size = args.step_size if args.step_size is not None \
-        else np.abs(args.low_value - args.high_value) / args.steps
 
     with FPE(args.FPE_number) as fpe:
         frames_status = None
@@ -114,8 +112,8 @@ if __name__ == "__main__":
             assert parameter in old_values, "Unknown operating parameter: {}".format(parameter)
             assert parameter in fpe.house_keeping["analogue"], \
                 "Parameter doesn't correspond to any known housekeeping value: {}".format(parameter)
-            low_value = args.low_value if args.low_value is not float('NaN') else fpe.ops[parameter].range_low
-            high_value = args.high_value if args.high_value is not float('NaN') else fpe.ops[parameter].range_high
+            low_value = args.low_value if args.low_value is not None else fpe.ops[parameter].range_low
+            high_value = args.high_value if args.high_value is not None else fpe.ops[parameter].range_high
             low_value, high_value = (low_value, high_value) if low_value < high_value else (high_value, low_value)
             actual_range_low, actual_range_high = \
                 (fpe.ops[parameter].range_low, fpe.ops[parameter].range_high) if \
@@ -127,6 +125,8 @@ if __name__ == "__main__":
             assert high_value <= actual_range_high, "Value {high_value} out of range; " \
                                                     "highest value is {high}".format(high=actual_range_high,
                                                                                      high_value=high_value)
+            step_size = args.step_size if args.step_size is not None \
+                else np.abs(high_value - low_value) / args.steps
             if args.set_defaults is True:
                 fpe.ops.reset_to_defaults()
             measurements = {}
