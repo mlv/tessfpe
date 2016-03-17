@@ -132,11 +132,11 @@ if __name__ == "__main__":
                                                     "highest value is {high}".format(high=actual_range_high,
                                                                                      high_value=high_value)
             step_size = args.step_size if args.step_size is not None \
-                else np.abs(high_value - low_value) / args.steps
+                else np.abs(high_value - low_value) / (args.steps - 1)
             if args.set_defaults is True:
                 fpe.ops.reset_to_defaults()
             measurements = {}
-            for value in np.arange(low_value, high_value, step_size):
+            for value in np.arange(low_value, high_value + step_size, step_size):
                 fpe.ops[parameter].value = value
                 fpe.ops.send()
                 measurements[value] = []
