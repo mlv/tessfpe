@@ -50,15 +50,17 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         info_text = 'Parameter: {parameter_name}\n' \
                     'Minimum value: {minimum_value}\n' \
                     'Maximum value: {maximum_value}\n' \
+                    'Steps: {step_count}\n' \
                     'Step size: {step_size}\n' \
                     'Samples per step: {samples_per_step}'.format(
             parameter_name=parameter_name,
             minimum_value=min(x),
             maximum_value=max(x),
+            step_count=len(measurement_data.keys()),
             step_size=calculated_step_size,
             samples_per_step=samples_per_step
         )
-        plt.text(min_value, min_value - 2, info_text)
+        plt.text(min_value, min_value - 6, info_text)
         # Makes some assumptions about measurement_data, be careful!
         pdf_information = pdf.infodict()
         pdf_information['Title'] = parameter_name
