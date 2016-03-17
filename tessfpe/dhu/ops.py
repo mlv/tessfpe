@@ -108,7 +108,8 @@ import binary_files
 
 OperatingParameterInfo = \
     collections.namedtuple('OperatingParameterInfo',
-                           ['name', 'address', 'high', 'low', 'range_low', 'range_high', 'unit', 'default'])
+                           ['name', 'address', 'high', 'low', 'range_low', 'range_high', 'unit', 'default',
+                            'relative_to'])
 
 
 class OperatingParameter(object):
