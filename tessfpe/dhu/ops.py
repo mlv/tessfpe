@@ -164,12 +164,12 @@ class OperatingParameter(object):
         if actual_high <= actual_low:
             (actual_low, actual_high) = (actual_high, actual_low)
         if not (actual_low <= x <= actual_high):
-            raise Exception("Attempting to set value out of bounds.\n"
-                            + "value: {}\n".format(x)
-                            + "name: {}\n".format(self.name)
-                            + "address: {}\n".format(self.address)
-                            + "low: {}\n".format(self.low)
-                            + "high: {}".format(self.high))
+            raise Exception("Attempting to set value out of bounds.\n" +
+                            "value: {}\n".format(x) +
+                            "name: {}\n".format(self.name) +
+                            "address: {}\n".format(self.address) +
+                            "low: {}\n".format(self.low) +
+                            "high: {}".format(self.high))
         self._value = x
         self._twelve_bit_value = int((x - self.low) / float(self.high - self.low) * (2 ** 12 - 1))
 
@@ -182,12 +182,12 @@ class OperatingParameter(object):
     def twelve_bit_value(self, x):
         if not (type(x) is int and 0 <= x < 2 ** 12):
             raise Exception(
-                "Attempting to set 12 bit unsigned integer value that is either not an integer or out of bounds.\n"
-                + "twelve bit value: {}\n".format(x)
-                + "name: {}\n".format(self.name)
-                + "address: {}\n".format(self.address)
-                + "low: {}\n".format(self.low)
-                + "high: {}".format(self.high))
+                "Attempting to set 12 bit unsigned integer value that is either not an integer or out of bounds.\n" +
+                "twelve bit value: {}\n".format(x) +
+                "name: {}\n".format(self.name) +
+                "address: {}\n".format(self.address) +
+                "low: {}\n".format(self.low) +
+                "high: {}".format(self.high))
         self._twelve_bit_value = x
         self._value = (self.high - self.low) / float(2 ** 12) * x + self.low
 
@@ -210,7 +210,7 @@ class DerivedOperatingParameter(object):
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
-            # Strict equality, could pretend other paramterizations are the same but let's not
+            # Strict equality, could pretend other parametrization are the same but let's not
             return self._base == other._base and self._offset == other._offset
         else:
             return False
