@@ -60,7 +60,10 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
             step_size=calculated_step_size,
             samples_per_step=samples_per_step
         )
-        plt.text(min_value, max_value, info_text)
+        plt.text(min_value, max_value, info_text,
+                 family='monospace',
+                 horizontalalignment='left',
+                 verticalalignment='top')
         # Makes some assumptions about measurement_data, be careful!
         pdf_information = pdf.infodict()
         pdf_information['Title'] = parameter_name
