@@ -58,7 +58,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
             step_size=calculated_step_size,
             samples_per_step=samples_per_step
         )
-        pylab.figtext(.02, .02, info_text)
+        plt.xlabel(info_text)
         # Makes some assumptions about measurement_data, be careful!
         pdf_information = pdf.infodict()
         pdf_information['Title'] = parameter_name
@@ -71,7 +71,6 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
 
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
-    from tessfpe.data.operating_parameters import default_operating_parameters
     import argparse
     import numpy as np
 
@@ -101,27 +100,7 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    assert args.low_value < args.high_value, "Low value '{low_value}' " \
-                                             "must be less than high value '{high_value}'".format(
-        low_value=args.low_value,
-        high_value=args.high_value
-    )
-
-    assert args.parameter in default_operating_parameters or \
-           args.parameter + "_offset" in default_operating_parameters, \
-        "Unknown parameter: {}".format(args.parameter)
-
-    if args.parameter + "_offset" not in default_operating_parameters:
-        assert default_operating_parameters[args.parameter]["low"] <= args.low_value < \
-               args.high_value <= default_operating_parameters[args.parameter]["high"], \
-            "The lowest value the parameter can take is: {lowest} and the highest value is {highest}".format(
-                lowest=default_operating_parameters[args.parameter]["low"],
-                highest=default_operating_parameters[args.parameter]["high"]
-            )
-
     parameter = args.parameter
-    low_value = args.low_value
-    high_value = args.high_value
     step_size = args.step_size if args.step_size is not None \
         else np.abs(args.low_value - args.high_value) / args.steps
 
@@ -132,19 +111,32 @@ if __name__ == "__main__":
             frames_status = fpe.frames_running_status
             fpe.frames_running_status = False
             old_values = fpe.ops.values
-            assert args.parameter in old_values, "Unknown operating parameter: {}".format(parameter)
-            assert args.parameter in fpe.house_keeping["analogue"], \
+            assert parameter in old_values, "Unknown operating parameter: {}".format(parameter)
+            assert parameter in fpe.house_keeping["analogue"], \
                 "Parameter doesn't correspond to any known housekeeping value: {}".format(parameter)
+            low_value = args.low_value if args.low_value is not None else fpe.ops[parameter].range_low
+            high_value = args.high_value if args.high_value is not None else fpe.ops[parameter].range_high
+            low_value, high_value = (low_value, high_value) if low_value < high_value else (high_value, low_value)
+            actual_range_low, actual_range_high = \
+                (fpe.ops[parameter].range_low, fpe.ops[parameter].range_high) if \
+                    fpe.ops[parameter].range_low < fpe.ops[parameter].range_high else \
+                    (fpe.ops[parameter].range_high, fpe.ops[parameter].range_low)
+            assert actual_range_low <= low_value, "Value {low_value} out of range; " \
+                                                  "lowest value is {low}".format(low_value=low_value,
+                                                                                 low=actual_range_low)
+            assert high_value <= actual_range_high, "Value {high_value} out of range; " \
+                                                    "highest value is {high}".format(high=actual_range_high,
+                                                                                     high_value=high_value)
             if args.set_defaults is True:
                 fpe.ops.reset_to_defaults()
             measurements = {}
-            for value in np.arange(args.low_value, args.high_value, step_size):
-                fpe.ops[args.parameter].value = value
+            for value in np.arange(low_value, high_value, step_size):
+                fpe.ops[parameter].value = value
                 fpe.ops.send()
                 measurements[value] = []
                 for _ in range(args.samples_per_step):
-                    measurements[value].append(fpe.house_keeping["analogue"][args.parameter])
-            print "Wrote {}".format(plot_data_to_pdf(args.parameter, measurements, filename=args.output))
+                    measurements[value].append(fpe.house_keeping["analogue"][parameter])
+            print "Wrote {}".format(plot_data_to_pdf(parameter, measurements, filename=args.output))
         finally:
             if old_values is not None:
                 for parameter in old_values:
