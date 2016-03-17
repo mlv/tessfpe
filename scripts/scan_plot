@@ -20,7 +20,7 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
     import datetime
     import os.path
     # Flatten measurements data into something less natural for matplotlib...
-    if os.path.isdir(filename):
+    if filename is not None and os.path.isdir(filename):
         filename = os.path.join(filename, parameter_name + ".pdf")
     if filename is None:
         filename = parameter_name + ".pdf"
