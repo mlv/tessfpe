@@ -35,21 +35,25 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
         plt.plot(np.arange(min_value, max_value + 1),
                  np.arange(min_value, max_value + 1))
         plt.title(parameter_name)
-        # Makes some assumptions about measurement_data, be careful!
         sorted_keys = list(sorted(measurements.keys()))
         calculated_step_size = sorted_keys[1] - sorted_keys[0]
         samples_per_step = len(measurement_data[measurement_data.keys()[0]])
-        pdf_information = pdf.infodict()
-        pdf_information['Title'] = "Plot of {parameter_name}, "
-        "from a minimum value of {min_value} "
-        "to a maximum value of {max_value} "
-        "with a step size of {step_size} "
-        "with {samples_per_step} samples per step".format(
+        info_text= 'Parameter: {parameter_name}\n' \
+                   'Minimum value: {min_value}\n' \
+                   'Maximum value: {max_value}\n' \
+                   'Step size: {step_size}\n' \
+                   'Samples per step: {samples_per_step'.format(
             parameter_name=parameter_name,
             minimum_value=min(x),
             maximum_value=max(x),
             step_size=calculated_step_size,
-            samples_per_step=samples_per_step)
+            samples_per_step=samples_per_step
+        )
+        pylab.figtext(.02, .02, info_text)
+        # Makes some assumptions about measurement_data, be careful!
+        pdf_information = pdf.infodict()
+        pdf_information['Title'] = '{parameter_name}'.format(parameter_name)
+        pdf_information['Subject'] = info_text
         pdf_information['CreationDate'] = datetime.datetime.today()
         pdf.savefig()
         plt.close()
