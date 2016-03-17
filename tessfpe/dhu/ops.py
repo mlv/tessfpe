@@ -236,7 +236,7 @@ class DerivedOperatingParameter(object):
 
     @property
     def range_low(self):
-        return self.low()
+        return self.low
 
     @property
     def high(self):
@@ -244,7 +244,7 @@ class DerivedOperatingParameter(object):
 
     @property
     def range_high(self):
-        return self.high()
+        return self.high
 
     @property
     def default(self):
