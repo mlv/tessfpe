@@ -8,7 +8,7 @@ Usage
 To create an operating parameter object, type (for example):
 
 >>> op = OperatingParameter("ccd4_parallel_low", \
- {"address": 89, "high": -13.2, "low": 0.0, "unit": "V", "default": -5.0})
+ {"address": 89, "high": -13.2, "low": 0.0, "range_high": -13.2, "range_low": 0.0, "unit": "V", "default": -5.0})
 
 You can read the supplied info by simply accessing the values like so:
 
@@ -108,7 +108,7 @@ import binary_files
 
 OperatingParameterInfo = \
     collections.namedtuple('OperatingParameterInfo',
-                           ['name', 'address', 'high', 'low', 'unit', 'default'])
+                           ['name', 'address', 'high', 'low', 'range_low', 'range_high', 'unit', 'default'])
 
 
 class OperatingParameter(object):
@@ -140,6 +140,16 @@ class OperatingParameter(object):
     def low(self):
         """The low value of the parameter"""
         return self._info.low
+
+    @property
+    def range_high(self):
+        """The high value of the parameter"""
+        return self._info.range_high
+
+    @property
+    def range_low(self):
+        """The low value of the parameter"""
+        return self._info.range_low
 
     @property
     def unit(self):
@@ -217,6 +227,22 @@ class DerivedOperatingParameter(object):
 
     def __ne__(self, other):
         return not self.__eq__(other)
+
+    @property
+    def low(self):
+        return max(self._base.value + self._offset.low, self._offset.range_low)
+
+    @property
+    def range_low(self):
+        return self.low()
+
+    @property
+    def high(self):
+        return min(self._base.value + self._offset.high, self._offset.range_high)
+
+    @property
+    def range_high(self):
+        return self.high()
 
     @property
     def default(self):

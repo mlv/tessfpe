@@ -16,7 +16,10 @@ def get_operating_parameters(tsv_file_name):
                 {"address_offset": int(line[0]),
                  "low": float(line[4]),
                  "high": float(line[5]),
+                 "range_low": float(line[6]),
+                 "range_high": float(line[7]),
                  "unit": line[8],
+                 "relative_to": line[9].lower().replace(' ', '_') if line[9] is not '' else None,
                  "default": defaults[line[1]]}
             for line in read_data_tsv(tsv_file_name)
             if line[4] != '' and line[5] != ''}
@@ -29,6 +32,7 @@ default_operating_parameters = \
           "low": entry["low"],
           "high": entry["high"],
           "unit": entry["unit"],
+          "relative_to": 'ccd' + ccd + '_' + entry["relative_to"] if entry["relative_to"] is not None else None,
           "default": entry["default"]}
      for address_offset, ccd, group in read_data_tsv("HKmap.tsv")
      for entry_name, entry in get_operating_parameters(
