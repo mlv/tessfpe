@@ -1,0 +1,829 @@
+defaults {
+    P1-IA-1 high P2-IA-1 high P3-IA-1 low
+    P1-IA-2 high P2-IA-2 high P3-IA-2 low
+    P1-IA-3 high P2-IA-3 high P3-IA-3 low
+    P1-IA-4 high P2-IA-4 high P3-IA-4 low
+    P1-FS-1 low P2-FS-1 high P3-FS-1 low
+    P1-FS-2 low P2-FS-2 high P3-FS-2 low
+    P1-FS-3 low P2-FS-3 high P3-FS-3 low
+    P1-FS-4 low P2-FS-4 high P3-FS-4 low
+    P1-OR low P2-OR high P3-OR high
+    P1-U low P2-U low P3-U low
+    RG high ID high
+    Int low DeInt low Clamp low CNV high
+    }
+
+sequence pixcycle {
+    step						/* 0 */
+    Clamp high step			/* 1 */
+    RG low step				/* 2 */
+    P2-OR low step			/* 3 */
+    step						/* 4 */
+    Clamp low step			/* 5 */
+    DeInt high step			/* 6 */
+    P1-OR high step			/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    P3-OR low step			/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    P2-OR high Int high step	/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    P1-OR low step			/* 20 */
+    Int low step				/* 21 */
+    RG high step				/* 22 */
+    P3-OR high step			/* 23 */
+    }
+
+sequence fr2serial {
+    step						/* 0 */
+    Clamp high step			/* 1 */
+    RG low step				/* 2 */
+    P2-OR low step			/* 3 */
+    step						/* 4 */
+    Clamp low step			/* 5 */
+    DeInt high step			/* 6 */
+    P1-OR high step			/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    P3-OR low step			/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    Int high step				/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    step						/* 20 */
+    Int low step				/* 21 */
+    RG high step				/* 22 */
+    step						/* 23 */
+    P3-FS-4 high P3-FS-3 high P3-FS-2 high P3-FS-1 high P2-OR high CNV high step	/* 24 */
+    Clamp high step			/* 25 */
+    RG low step				/* 26 */
+    step						/* 27 */
+    step						/* 28 */
+    Clamp low step			/* 29 */
+    DeInt high step			/* 30 */
+    step						/* 31 */
+    CNV low step				/* 32 */
+    step						/* 33 */
+    step						/* 34 */
+    step						/* 35 */
+    DeInt low step			/* 36 */
+    step						/* 37 */
+    step						/* 38 */
+    Int high step				/* 39 */
+    step						/* 40 */
+    step						/* 41 */
+    step						/* 42 */
+    step						/* 43 */
+    step						/* 44 */
+    Int low step				/* 45 */
+    RG high step				/* 46 */
+    step						/* 47 */
+    P2-FS-4 low P2-FS-3 low P2-FS-2 low P2-FS-1 low CNV high step /* 48 */
+    P1-OR low Clamp high step	/* 49 */
+    RG low step				/* 50 */
+    step						/* 51 */
+    step						/* 52 */
+    Clamp low step			/* 53 */
+    DeInt high step			/* 54 */
+    step						/* 55 */
+    CNV low step				/* 56 */
+    step						/* 57 */
+    step						/* 58 */
+    step						/* 59 */
+    DeInt low step			/* 60 */
+    step						/* 61 */
+    step						/* 62 */
+    Int high step				/* 63 */
+    step						/* 64 */
+    step						/* 65 */
+    step						/* 66 */
+    step						/* 67 */
+    step						/* 68 */
+    Int low step				/* 69 */
+    RG high step				/* 70 */
+    step						/* 71 */
+    P1-FS-4 high P1-FS-3 high P1-FS-2 high P1-FS-1 high P3-OR high CNV high step	/* 72 */
+    Clamp high step			/* 73 */
+    RG low step				/* 74 */
+    step						/* 75 */
+    step						/* 76 */
+    Clamp low step			/* 77 */
+    DeInt high step			/* 78 */
+    step						/* 79 */
+    CNV low step				/* 80 */
+    step						/* 81 */
+    step						/* 82 */
+    step						/* 83 */
+    DeInt low step			/* 84 */
+    step						/* 85 */
+    step						/* 86 */
+    Int high step				/* 87 */
+    step						/* 88 */
+    step						/* 89 */
+    step						/* 90 */
+    step						/* 91 */
+    step						/* 92 */
+    Int low step				/* 93 */
+    RG high step				/* 94 */
+    step						/* 95 */
+    P2-FS-4 low P2-FS-3 low P2-FS-2 low P2-FS-1 low P2-OR low CNV high step  /* 96 */
+    Clamp high step			/* 97 */
+    RG low step				/* 98 */
+    step						/* 99 */
+    step						/* 100 */
+    Clamp low step			/* 101 */
+    DeInt low step			/* 102 */
+    P1-OR low step			/* 103 */
+    CNV low step				/* 104 */
+    step						/* 105 */
+    step						/* 106 */
+    P3-OR low step			/* 107 */
+    DeInt low step			/* 108 */
+    step						/* 109 */
+    step						/* 110 */
+    P2-OR low Int low step	/* 111 */
+    step						/* 112 */
+    step						/* 113 */
+    step						/* 114 */
+    step						/* 115 */
+    P1-OR low step			/* 116 */
+    Int low step				/* 117 */
+    RG high step				/* 118 */
+    P3-OR high step			/* 119 */
+    P2-FS-4 high P2-FS-3 high P2-FS-2 high P2-FS-1 high CNV high step	/* 120 */
+    Clamp high step			/* 121 */
+    RG low step				/* 122 */
+    P2-OR low step			/* 123 */
+    step						/* 124 */
+    Clamp low step			/* 125 */
+    DeInt high step			/* 126 */
+    P1-OR high step			/* 127 */
+    CNV low step				/* 128 */
+    step						/* 129 */
+    step						/* 130 */
+    P3-OR low step			/* 131 */
+    DeInt low step			/* 132 */
+    step						/* 133 */
+    step						/* 134 */
+    P2-OR high Int high step	/* 135 */
+    step						/* 136 */
+    step						/* 137 */
+    step						/* 138 */
+    step						/* 139 */
+    P1-OR low step			/* 140 */
+    Int low step				/* 141 */
+    RG high step				/* 142 */
+    P3-OR high step			/* 143 */
+    }
+
+sequence rowtransfer1 {
+    step						/* 0 */
+    Clamp high step			/* 1 */
+    step						/* 2 */
+    step						/* 3 */
+    step						/* 4 */
+    Clamp low step			/* 5 */
+    DeInt high step			/* 6 */
+    step						/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    step						/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    Int high step				/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    step						/* 20 */
+    Int low step				/* 21 */
+    step						/* 22 */
+    step						/* 23 */
+    P3-IA-1 high P3-FS-1 high CNV high step	/* 24 */
+    Clamp high step			/* 25 */
+    step						/* 26 */
+    step						/* 27 */
+    step						/* 28 */
+    Clamp low step			/* 29 */
+    DeInt high step			/* 30 */
+    step						/* 31 */
+    CNV low step				/* 32 */
+    step						/* 33 */
+    step						/* 34 */
+    step						/* 35 */
+    DeInt low step			/* 36 */
+    step						/* 37 */
+    step						/* 38 */
+    Int high step				/* 39 */
+    step						/* 40 */
+    step						/* 41 */
+    step						/* 42 */
+    step						/* 43 */
+    step						/* 44 */
+    Int low step				/* 45 */
+    step						/* 46 */
+    step						/* 47 */
+    P2-IA-1 low P2-FS-1 low CNV high step	/* 48 */
+    Clamp high step			/* 49 */
+    step						/* 50 */
+    step						/* 51 */
+    step						/* 52 */
+    Clamp low step			/* 53 */
+    DeInt high step			/* 54 */
+    step						/* 55 */
+    CNV low step				/* 56 */
+    step						/* 57 */
+    step						/* 58 */
+    step						/* 59 */
+    DeInt low step			/* 60 */
+    step						/* 61 */
+    step						/* 62 */
+    Int high step				/* 63 */
+    step						/* 64 */
+    step						/* 65 */
+    step						/* 66 */
+    step						/* 67 */
+    step						/* 68 */
+    Int low step				/* 69 */
+    step						/* 70 */
+    step						/* 71 */
+    P1-IA-1 high P1-FS-1 high CNV high step	/* 72 */
+    Clamp high step			/* 73 */
+    step						/* 74 */
+    step						/* 75 */
+    step						/* 76 */
+    Clamp low step			/* 77 */
+    DeInt high step			/* 78 */
+    step						/* 79 */
+    CNV low step				/* 80 */
+    step						/* 81 */
+    step						/* 82 */
+    step						/* 83 */
+    DeInt low step			/* 84 */
+    step						/* 85 */
+    step						/* 86 */
+    Int high step				/* 87 */
+    step						/* 88 */
+    step						/* 89 */
+    step						/* 90 */
+    step						/* 91 */
+    step						/* 92 */
+    Int low step				/* 93 */
+    step						/* 94 */
+    step						/* 95 */
+    P3-IA-1 low P3-FS-1 low CNV high step						/* 96 */
+    Clamp high step			/* 97 */
+    step						/* 98 */
+    step						/* 99 */
+    step						/* 100 */
+    Clamp low step			/* 101 */
+    DeInt high step			/* 102 */
+    step						/* 103 */
+    CNV low step				/* 104 */
+    step						/* 105 */
+    step						/* 106 */
+    step						/* 107 */
+    DeInt low step			/* 108 */
+    step						/* 109 */
+    step						/* 110 */
+    Int high step				/* 111 */
+    step						/* 112 */
+    step						/* 113 */
+    step						/* 114 */
+    step						/* 115 */
+    step						/* 116 */
+    Int low step				/* 117 */
+    step						/* 118 */
+    step						/* 119 */
+    P2-IA-1 high P2-FS-1 high CNV high step	/* 120 */
+    Clamp high step			/* 121 */
+    step						/* 122 */
+    step						/* 123 */
+    step						/* 124 */
+    Clamp low step			/* 125 */
+    DeInt high step			/* 126 */
+    step						/* 127 */
+    CNV low step				/* 128 */
+    step						/* 129 */
+    step						/* 130 */
+    step						/* 131 */
+    DeInt low step			/* 132 */
+    step						/* 133 */
+    step						/* 134 */
+    Int high step				/* 135 */
+    step						/* 136 */
+    step						/* 137 */
+    step						/* 138 */
+    step						/* 139 */
+    step						/* 140 */
+    Int low step				/* 141 */
+    step						/* 142 */
+    step						/* 143 */
+} 
+
+sequence rowtransfer2 {
+    step						/* 0 */
+    Clamp high step			/* 1 */
+    step						/* 2 */
+    step						/* 3 */
+    step						/* 4 */
+    Clamp low step			/* 5 */
+    DeInt high step			/* 6 */
+    step						/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    step						/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    Int high step				/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    step						/* 20 */
+    Int low step				/* 21 */
+    step						/* 22 */
+    step						/* 23 */
+    P3-IA-2 high P3-FS-2 high CNV high step	/* 24 */
+    Clamp high step			/* 25 */
+    step						/* 26 */
+    step						/* 27 */
+    step						/* 28 */
+    Clamp low step			/* 29 */
+    DeInt high step			/* 30 */
+    step						/* 31 */
+    CNV low step				/* 32 */
+    step						/* 33 */
+    step						/* 34 */
+    step						/* 35 */
+    DeInt low step			/* 36 */
+    step						/* 37 */
+    step						/* 38 */
+    Int high step				/* 39 */
+    step						/* 40 */
+    step						/* 41 */
+    step						/* 42 */
+    step						/* 43 */
+    step						/* 44 */
+    Int low step				/* 45 */
+    step						/* 46 */
+    step						/* 47 */
+    P2-IA-2 low P2-FS-2 low CNV high step	/* 48 */
+    Clamp high step			/* 49 */
+    step						/* 50 */
+    step						/* 51 */
+    step						/* 52 */
+    Clamp low step			/* 53 */
+    DeInt high step			/* 54 */
+    step						/* 55 */
+    CNV low step				/* 56 */
+    step						/* 57 */
+    step						/* 58 */
+    step						/* 59 */
+    DeInt low step			/* 60 */
+    step						/* 61 */
+    step						/* 62 */
+    Int high step				/* 63 */
+    step						/* 64 */
+    step						/* 65 */
+    step						/* 66 */
+    step						/* 67 */
+    step						/* 68 */
+    Int low step				/* 69 */
+    step						/* 70 */
+    step						/* 71 */
+    P1-IA-2 high P1-FS-2 high CNV high step	/* 72 */
+    Clamp high step			/* 73 */
+    step						/* 74 */
+    step						/* 75 */
+    step						/* 76 */
+    Clamp low step			/* 77 */
+    DeInt high step			/* 78 */
+    step						/* 79 */
+    CNV low step				/* 80 */
+    step						/* 81 */
+    step						/* 82 */
+    step						/* 83 */
+    DeInt low step			/* 84 */
+    step						/* 85 */
+    step						/* 86 */
+    Int high step				/* 87 */
+    step						/* 88 */
+    step						/* 89 */
+    step						/* 90 */
+    step						/* 91 */
+    step						/* 92 */
+    Int low step				/* 93 */
+    step						/* 94 */
+    step						/* 95 */
+    P3-IA-2 low P3-FS-2 low CNV high step						/* 96 */
+    Clamp high step			/* 97 */
+    step						/* 98 */
+    step						/* 99 */
+    step						/* 100 */
+    Clamp low step			/* 101 */
+    DeInt high step			/* 102 */
+    step						/* 103 */
+    CNV low step				/* 104 */
+    step						/* 105 */
+    step						/* 106 */
+    step						/* 107 */
+    DeInt low step			/* 108 */
+    step						/* 109 */
+    step						/* 110 */
+    Int high step				/* 111 */
+    step						/* 112 */
+    step						/* 113 */
+    step						/* 114 */
+    step						/* 115 */
+    step						/* 116 */
+    Int low step				/* 117 */
+    step						/* 118 */
+    step						/* 119 */
+    P2-IA-2 high P2-FS-2 high CNV high step	/* 120 */
+    Clamp high step			/* 121 */
+    step						/* 122 */
+    step						/* 123 */
+    step						/* 124 */
+    Clamp low step			/* 125 */
+    DeInt high step			/* 126 */
+    step						/* 127 */
+    CNV low step				/* 128 */
+    step						/* 129 */
+    step						/* 130 */
+    step						/* 131 */
+    DeInt low step			/* 132 */
+    step						/* 133 */
+    step						/* 134 */
+    Int high step				/* 135 */
+    step						/* 136 */
+    step						/* 137 */
+    step						/* 138 */
+    step						/* 139 */
+    step						/* 140 */
+    Int low step				/* 141 */
+    step						/* 142 */
+    step						/* 143 */
+} 
+
+sequence rowtransfer3 {
+    step						/* 0 */
+    Clamp high step			/* 1 */
+    step						/* 2 */
+    step						/* 3 */
+    step						/* 4 */
+    Clamp low step			/* 5 */
+    DeInt high step			/* 6 */
+    step						/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    step						/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    Int high step				/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    step						/* 20 */
+    Int low step				/* 21 */
+    step						/* 22 */
+    step						/* 23 */
+    P3-IA-3 high P3-FS-3 high CNV high step	/* 24 */
+    Clamp high step			/* 25 */
+    step						/* 26 */
+    step						/* 27 */
+    step						/* 28 */
+    Clamp low step			/* 29 */
+    DeInt high step			/* 30 */
+    step						/* 31 */
+    CNV low step				/* 32 */
+    step						/* 33 */
+    step						/* 34 */
+    step						/* 35 */
+    DeInt low step			/* 36 */
+    step						/* 37 */
+    step						/* 38 */
+    Int high step				/* 39 */
+    step						/* 40 */
+    step						/* 41 */
+    step						/* 42 */
+    step						/* 43 */
+    step						/* 44 */
+    Int low step				/* 45 */
+    step						/* 46 */
+    step						/* 47 */
+    P2-IA-3 low P2-FS-3 low CNV high step	/* 48 */
+    Clamp high step			/* 49 */
+    step						/* 50 */
+    step						/* 51 */
+    step						/* 52 */
+    Clamp low step			/* 53 */
+    DeInt high step			/* 54 */
+    step						/* 55 */
+    CNV low step				/* 56 */
+    step						/* 57 */
+    step						/* 58 */
+    step						/* 59 */
+    DeInt low step			/* 60 */
+    step						/* 61 */
+    step						/* 62 */
+    Int high step				/* 63 */
+    step						/* 64 */
+    step						/* 65 */
+    step						/* 66 */
+    step						/* 67 */
+    step						/* 68 */
+    Int low step				/* 69 */
+    step						/* 70 */
+    step						/* 71 */
+    P1-IA-3 high P1-FS-3 high CNV high step	/* 72 */
+    Clamp high step			/* 73 */
+    step						/* 74 */
+    step						/* 75 */
+    step						/* 76 */
+    Clamp low step			/* 77 */
+    DeInt high step			/* 78 */
+    step						/* 79 */
+    CNV low step				/* 80 */
+    step						/* 81 */
+    step						/* 82 */
+    step						/* 83 */
+    DeInt low step			/* 84 */
+    step						/* 85 */
+    step						/* 86 */
+    Int high step				/* 87 */
+    step						/* 88 */
+    step						/* 89 */
+    step						/* 90 */
+    step						/* 91 */
+    step						/* 92 */
+    Int low step				/* 93 */
+    step						/* 94 */
+    step						/* 95 */
+    P3-IA-3 low P3-FS-3 low CNV high step						/* 96 */
+    Clamp high step			/* 97 */
+    step						/* 98 */
+    step						/* 99 */
+    step						/* 100 */
+    Clamp low step			/* 101 */
+    DeInt high step			/* 102 */
+    step						/* 103 */
+    CNV low step				/* 104 */
+    step						/* 105 */
+    step						/* 106 */
+    step						/* 107 */
+    DeInt low step			/* 108 */
+    step						/* 109 */
+    step						/* 110 */
+    Int high step				/* 111 */
+    step						/* 112 */
+    step						/* 113 */
+    step						/* 114 */
+    step						/* 115 */
+    step						/* 116 */
+    Int low step				/* 117 */
+    step						/* 118 */
+    step						/* 119 */
+    P2-IA-3 high P2-FS-3 high CNV high step	/* 120 */
+    Clamp high step			/* 121 */
+    step						/* 122 */
+    step						/* 123 */
+    step						/* 124 */
+    Clamp low step			/* 125 */
+    DeInt high step			/* 126 */
+    step						/* 127 */
+    CNV low step				/* 128 */
+    step						/* 129 */
+    step						/* 130 */
+    step						/* 131 */
+    DeInt low step			/* 132 */
+    step						/* 133 */
+    step						/* 134 */
+    Int high step				/* 135 */
+    step						/* 136 */
+    step						/* 137 */
+    step						/* 138 */
+    step						/* 139 */
+    step						/* 140 */
+    Int low step				/* 141 */
+    step						/* 142 */
+    step						/* 143 */
+} 
+
+sequence rowtransfer4 {
+    step						/* 0 */
+    Clamp high step			/* 1 */
+    step						/* 2 */
+    step						/* 3 */
+    step						/* 4 */
+    Clamp low step			/* 5 */
+    DeInt high step			/* 6 */
+    step						/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    step						/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    Int high step				/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    step						/* 20 */
+    Int low step				/* 21 */
+    step						/* 22 */
+    step						/* 23 */
+    P3-IA-4 high P3-FS-4 high CNV high step	/* 24 */
+    Clamp high step			/* 25 */
+    step						/* 26 */
+    step						/* 27 */
+    step						/* 28 */
+    Clamp low step			/* 29 */
+    DeInt high step			/* 30 */
+    step						/* 31 */
+    CNV low step				/* 32 */
+    step						/* 33 */
+    step						/* 34 */
+    step						/* 35 */
+    DeInt low step			/* 36 */
+    step						/* 37 */
+    step						/* 38 */
+    Int high step				/* 39 */
+    step						/* 40 */
+    step						/* 41 */
+    step						/* 42 */
+    step						/* 43 */
+    step						/* 44 */
+    Int low step				/* 45 */
+    step						/* 46 */
+    step						/* 47 */
+    P2-IA-4 low P2-FS-4 low CNV high step	/* 48 */
+    Clamp high step			/* 49 */
+    step						/* 50 */
+    step						/* 51 */
+    step						/* 52 */
+    Clamp low step			/* 53 */
+    DeInt high step			/* 54 */
+    step						/* 55 */
+    CNV low step				/* 56 */
+    step						/* 57 */
+    step						/* 58 */
+    step						/* 59 */
+    DeInt low step			/* 60 */
+    step						/* 61 */
+    step						/* 62 */
+    Int high step				/* 63 */
+    step						/* 64 */
+    step						/* 65 */
+    step						/* 66 */
+    step						/* 67 */
+    step						/* 68 */
+    Int low step				/* 69 */
+    step						/* 70 */
+    step						/* 71 */
+    P1-IA-4 high P1-FS-4 high CNV high step	/* 72 */
+    Clamp high step			/* 73 */
+    step						/* 74 */
+    step						/* 75 */
+    step						/* 76 */
+    Clamp low step			/* 77 */
+    DeInt high step			/* 78 */
+    step						/* 79 */
+    CNV low step				/* 80 */
+    step						/* 81 */
+    step						/* 82 */
+    step						/* 83 */
+    DeInt low step			/* 84 */
+    step						/* 85 */
+    step						/* 86 */
+    Int high step				/* 87 */
+    step						/* 88 */
+    step						/* 89 */
+    step						/* 90 */
+    step						/* 91 */
+    step						/* 92 */
+    Int low step				/* 93 */
+    step						/* 94 */
+    step						/* 95 */
+    P3-IA-4 low P3-FS-4 low CNV high step						/* 96 */
+    Clamp high step			/* 97 */
+    step						/* 98 */
+    step						/* 99 */
+    step						/* 100 */
+    Clamp low step			/* 101 */
+    DeInt high step			/* 102 */
+    step						/* 103 */
+    CNV low step				/* 104 */
+    step						/* 105 */
+    step						/* 106 */
+    step						/* 107 */
+    DeInt low step			/* 108 */
+    step						/* 109 */
+    step						/* 110 */
+    Int high step				/* 111 */
+    step						/* 112 */
+    step						/* 113 */
+    step						/* 114 */
+    step						/* 115 */
+    step						/* 116 */
+    Int low step				/* 117 */
+    step						/* 118 */
+    step						/* 119 */
+    P2-IA-4 high P2-FS-4 high CNV high step	/* 120 */
+    Clamp high step			/* 121 */
+    step						/* 122 */
+    step						/* 123 */
+    step						/* 124 */
+    Clamp low step			/* 125 */
+    DeInt high step			/* 126 */
+    step						/* 127 */
+    CNV low step				/* 128 */
+    step						/* 129 */
+    step						/* 130 */
+    step						/* 131 */
+    DeInt low step			/* 132 */
+    step						/* 133 */
+    step						/* 134 */
+    Int high step				/* 135 */
+    step						/* 136 */
+    step						/* 137 */
+    step						/* 138 */
+    step						/* 139 */
+    step						/* 140 */
+    Int low step				/* 141 */
+    step						/* 142 */
+    step						/* 143 */
+}
+
+sequence serialflush {
+    RG low step				/* 0 */
+    RG high step				/* 1 */
+    Clamp high step			/* 2 */
+    step						/* 3 */
+    step						/* 4 */
+    RG low step				/* 5 */
+    Clamp low DeInt high step	  /* 6 */
+    P1-OR high step			/* 7 */
+    CNV low step				/* 8 */
+    step						/* 9 */
+    step						/* 10 */
+    P3-OR low step			/* 11 */
+    DeInt low step			/* 12 */
+    step						/* 13 */
+    step						/* 14 */
+    P2-OR high Int high step	/* 15 */
+    step						/* 16 */
+    step						/* 17 */
+    step						/* 18 */
+    step						/* 19 */
+    P1-OR low step			/* 20 */
+    Int low step				/* 21 */
+    step						/* 22 */
+    P3-OR high step			/* 23 */
+} 
+
+
+parameter rows = 2078;	/* number of rows */
+
+/*
+The sequencer program.
+*/
+
+no_data ( 89*6 ) serialflush;
+no_data ( rows ) rowtransfer1;
+no_data ( rows ) rowtransfer2;
+no_data ( rows ) rowtransfer3;
+no_data ( rows ) rowtransfer4;
+
+frame { 
+	do( 2078 ) {
+		no_data ( 1 ) fr2serial;
+		pixel_data ( 534 ) pixcycle;
+	}
+}
+
+/*
+If we get this far, just keep doing pixcycles until a new frame.
+*/
+
+hold pixcycle;
