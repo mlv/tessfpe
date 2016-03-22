@@ -25,3 +25,7 @@ WeHideAndSeek:
 Like UpAndRunning, but with reversed parallel clocks for room temperature testing.
 
 
+-------------------------------------------------------------------------------------
+
+Like UpAndRunning, but injects charge into the lowest "smear" row.
+
