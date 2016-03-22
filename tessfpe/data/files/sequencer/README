@@ -1,0 +1,27 @@
+TESS CCD clock sequencer programs for testing.
+
+-------------------------------------------------------------------------------------
+
+DolphinDance:
+
+Simplistic CCD clocking. Start of line bias not as flat as possible.
+	
+Integrates in P1-IA and P2-IA. Holds charge in P2-FS.
+	
+Defaults to a disabled measurement chain with charge queued in P2-OR and P3-OR.
+
+Charge injection disabled.
+
+-------------------------------------------------------------------------------------
+	
+UpAndRunning:
+
+Similar to DolphinDance, but attempts to flatten bias by dummy clocking for 32 pixel cycles after a parallel to serial transfer. It uses the upper serial register as a "dummy load" for the serial drivers.
+
+-------------------------------------------------------------------------------------
+
+WeHideAndSeek:
+
+Like UpAndRunning, but with reversed parallel clocks for room temperature testing.
+
+
