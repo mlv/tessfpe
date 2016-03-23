@@ -25,7 +25,7 @@ test:
 	make -C tessfpe test
 
 clean:
-	rm -rf $(shell find . -name "*.pyc")
-	rm -rf MANIFEST dist/ tessfpe.egg-info/ build/
 	make -C tessfpe clean
 	make -C testsuite clean
+	rm -rf $(shell find . -name "*.pyc")
+	rm -rf MANIFEST dist/ tessfpe.egg-info/ build/
