@@ -29,13 +29,11 @@ ${PYTHON} ${DIR}/venv/bin/observatory_simulator_version
 ${PYTHON} ${DIR}/venv/bin/frames_running_status
 ${PYTHON} ${DIR}/venv/bin/stop_frames
 ${PYTHON} ${DIR}/venv/bin/frames_running_status
-${PYTHON} ${DIR}/venv/bin/digital_house_keeping
 
 ${PYTHON} ${DIR}/venv/bin/start_frames
 sleep 5
 ${PYTHON} ${DIR}/venv/bin/stop_frames
 ${PYTHON} ${DIR}/venv/bin/frames_running_status
-${PYTHON} ${DIR}/venv/bin/digital_house_keeping
 ${PYTHON} ${DIR}/venv/bin/operating_parameters
 ${PYTHON} ${DIR}/venv/bin/operating_parameters --set-defaults
 ${PYTHON} ${DIR}/venv/bin/start_frames
