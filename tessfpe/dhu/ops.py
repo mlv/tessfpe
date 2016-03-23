@@ -232,7 +232,11 @@ class DerivedOperatingParameter(object):
 
     @property
     def low(self):
-        return max(self._base.value + self._offset.low, self._offset.range_low)
+        actual_offset_low = self._offset.low \
+            if self._offset.low <= self._offset.high else self._offset.high
+        actual_offset_range_low = self._offset.range_low \
+            if self._offset.range_low <= self._offset.range_high else self._offset.range_high
+        return max(self._base.value + actual_offset_low, actual_offset_range_low)
 
     @property
     def range_low(self):
@@ -240,7 +244,11 @@ class DerivedOperatingParameter(object):
 
     @property
     def high(self):
-        return min(self._base.value + self._offset.high, self._offset.range_high)
+        actual_offset_high = self._offset.high \
+            if self._offset.low <= self._offset.high else self._offset.low
+        actual_offset_range_high = self._offset.range_high \
+            if self._offset.range_low <= self._offset.range_high else self._offset.range_low
+        return min(self._base.value + actual_offset_high, actual_offset_range_high)
 
     @property
     def range_high(self):
