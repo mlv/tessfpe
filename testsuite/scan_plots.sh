@@ -6,7 +6,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Increase these numbers to make this take longer to run
 SAMPLES_PER_STEP=2
-STEPS=5
+STEPS=20
 
 # Where to dump the plots; change this for different scripts.  Make sure it is empty before running this script
 OUTPUT_DIR=${DIR}/operating_parameter_scan_plots
