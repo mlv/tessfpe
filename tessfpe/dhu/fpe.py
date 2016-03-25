@@ -364,11 +364,6 @@ class FPE(object):
                 "digital": digital}
 
     @property
-    def analogue_house_keeping_with_units(self):
-        hsk = self.cam_hsk()
-        return house_keeping.hsk_to_analogue_dictionary_with_units(hsk)
-
-    @property
     def version(self):
         """Version property for the Observatory Simulator DHU software"""
         return self.cam_version()
@@ -387,22 +382,6 @@ class FPE(object):
     def control_status(self, val):
         """Set the camera control status for the Observatory Simulator for a particular FPE"""
         self.cam_control(val)
-
-    @property
-    def expected_housekeeping(self):
-        """Report the expected values for the housekeeping"""
-        from copy import deepcopy
-        from ..data.housekeeping_channels import housekeeping_channels
-        from ..dhu.unit_tests import voltage_reference_values, temperature_sensor_calibration_values
-        expected_values = deepcopy(self.ops.values)
-        for k in housekeeping_channels:
-            if 'bias' in k:
-                expected_values[k] = 0
-        for v in voltage_reference_values:
-            expected_values[v] = voltage_reference_values[v]
-        for v in temperature_sensor_calibration_values:
-            expected_values[v] = temperature_sensor_calibration_values[v]
-        return expected_values
 
     @property
     def ops(self):
