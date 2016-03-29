@@ -134,6 +134,18 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
                                                        for col in report.columns.values})
 
 
+def colorize_text(text):
+    """ Make ok appear in green and lines with FAIL be red
+    :param text: str
+    :return: str
+    """
+    from termcolor import colored
+    return "\n".join(
+        line.replace(' ok', colored(' ok', 'green')) if ' ok' in line else
+        (colored(line, 'red', attrs=['bold']) if ' FAIL' in line else line)
+        for line in text.split('\n')
+    )
+
 def unique(ls):
     """Takes an iterable and returns a unique list of elements"""
     visited = set()
@@ -197,8 +209,9 @@ if __name__ == "__main__":
             for k in channels:
                 reported_values[k].append(hk["analogue"][k])
 
-        print report_table(reported_values,
-                           expected_values,
-                           keys=channels,
-                           precision=args.precision)
-        sys.exit(0)  # 0 is SUCCESS for shell commands
+        output = colorize_text(report_table(reported_values,
+                                            expected_values,
+                                            keys=channels,
+                                            precision=args.precision))
+        print output
+        sys.exit(1 if FAIL in output else 0)  # 0 is SUCCESS for shell commands
