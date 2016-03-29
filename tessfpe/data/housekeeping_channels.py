@@ -11,7 +11,7 @@ from data import read_data_tsv
 
 
 def get_housekeeping_channels(tsv_file_name):
-    "Extract the housekeeping parameters from a data TSV file"
+    """Extract the housekeeping parameters from a data TSV file"""
     return {line[1].lower().replace(' ', '_'):
                 {"address_offset": int(line[0]),
                  "low": float(line[2]),
