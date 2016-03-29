@@ -214,4 +214,4 @@ if __name__ == "__main__":
                                             keys=channels,
                                             precision=args.precision))
         print output
-        sys.exit(1 if FAIL in output else 0)  # 0 is SUCCESS for shell commands
+        sys.exit(1 if 'FAIL' in output else 0)  # 0 is SUCCESS for shell commands
