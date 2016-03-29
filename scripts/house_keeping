@@ -2,12 +2,47 @@
 # -*- coding: utf-8 -*-
 """This script performs measurements of reference voltages to verify functionality."""
 
+def parse_expected_values_json(expected_values_json, operating_parameters):
+    """Parse expected values from a json"""
+    import json
+    from tessfpe.data.housekeeping_channels import housekeeping_channels
+    with open(expected_values_json) as f:
+        expected_values_data = json.load(f)
+    expected_values_out = deepcopy(expected_values_data)
+    for key in expected_values_data:
+        assert key in housekeeping_channels, "Unknown housekeeping channel \"{key}\"".format(key=key)
+        assert "value" in expected_values_data[key], "No \"value\" field for channel \"{key}\"".format(key=key)
+        if expected_values_data[key]["value"] is "auto":
+            assert key in operating_parameters, \
+                "Cannot automatically infer expected value for \"{key}\"".format(key=key)
+            expected_values_out[key]["value"] = operating_parameters["key"]
+
+        assert "tolerance" in expected_values_data[key], \
+            "No \"tolerance\" field for channel \"{key}\"".format(key=key)
+        tolerance = expected_values_data[key]["tolerance"]
+        assert re.match("[0-9]+%", tolerance) \
+            if isinstance(tolerance, basestring) else isinstance(tolerance, float), \
+            "Tolerance must be a string \"X%\" " \
+            "(where X is an integer between 0 and 100) " \
+            "or a floating point.  Tolerance for key \"{key}\" was set to \"{tolerance}\"".format(
+                key=key,
+                tolerance=tolerance
+            )
+        if isinstance(tolerance, basestring):
+            percentage = int(tolerance[:-1])
+            assert 0 <= percentage <= 100, "Cannot have tolerance be {percentage}%".format(percentage=percentage)
+            total_range = abs(housekeeping_channels[key]["high"] - housekeeping_channels[key]["low"])
+            expected_values_out[key]["tolerance"] = float(percentage) / 100.0 * total_range
+    return expected_values_out
+
 
 def report_table(data, expected_values={}, precision=4, keys=None):
     """Make a table (string) reporting the values of housekeeping data"""
     from tessfpe.data.housekeeping_channels import housekeeping_channels
     import numpy as np
     import pandas as pd
+    if not isinstance(expected_values, dict):
+        expected_values = {}
     if keys is None:
         keys = data.keys()
         keys.sort()
@@ -87,9 +122,11 @@ if __name__ == "__main__":
     from copy import deepcopy
     import argparse
     import sys
+    import re
 
     # Parse the command line arguments
     parser = argparse.ArgumentParser(description='Get the analogue housekeeping data for specified parameters')
+    parser.add_argument('expected_values_json', nargs='?', default=None)
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--samples', metavar='N', type=int, nargs='?', default=1, help='number of samples to take')
     parser.add_argument('--precision', metavar='N', type=int, nargs='?', default=4,
@@ -101,6 +138,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with FPE(args.FPE_number, debug=args.debug) as fpe:
+        if args.expected_values_json is None:
+            expected_values = {}
+        else:
+            expected_values = parse_expected_values_json(args.expected_values_json, fpe.ops.values())
+
         if args.channels:
             channels = match_channels(args.channels, housekeeping_channels.keys(), sort=args.sort)
         else:
@@ -114,7 +156,7 @@ if __name__ == "__main__":
                 reported_values[k].append(hk["analogue"][k])
 
         print report_table(reported_values,
-                           #expected_values=fpe.expected_housekeeping,
+                           # expected_values=fpe.expected_housekeeping,
                            keys=channels,
                            precision=args.precision)
         sys.exit(0)  # 0 is SUCCESS for shell commands
