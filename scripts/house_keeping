@@ -94,7 +94,7 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
         samples_text = u""
         report = pd.DataFrame(
             np.transpose(
-                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j], units[j]) \
+                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["value"], units[j]) \
                       if j in expected_vals else "N/A"
                   for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(data[j], units[j])
