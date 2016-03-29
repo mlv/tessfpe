@@ -14,13 +14,13 @@ def parse_expected_values_json(expected_values_json, operating_parameters):
         assert key in housekeeping_channels, "Unknown housekeeping channel \"{key}\"".format(key=key)
         assert "value" in expected_values_data[key], "No \"value\" field for channel \"{key}\"".format(key=key)
         value = expected_values_data[key]["value"]
-        assert value is u"auto" or isinstance(value, float), \
+        assert (value in "auto" and "auto" in value) or isinstance(value, float), \
             "Expected value must be the string \"auto\" " \
             "or a floating point.  Value for key \"{key}\" was set to \"{value}\"".format(
                 key=key,
                 value=value
             )
-        if value is u"auto":
+        if value in "auto" and "auto" in value:
             assert key in operating_parameters, \
                 "Cannot automatically infer expected value for \"{key}\"".format(key=key)
             output[key]["value"] = operating_parameters[key]
