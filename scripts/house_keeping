@@ -10,6 +10,7 @@ class JSONParseException(Exception):
 def parse_expected_values_json(expected_values_json, operating_parameters):
     """Parse expected values from a json"""
     import json
+    import re
     from tessfpe.data.housekeeping_channels import housekeeping_channels
     expected_values_data = {}
     if isinstance(expected_values_json, file):
