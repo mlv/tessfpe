@@ -38,7 +38,7 @@ if __name__ == "__main__":
                 fpe.ops.reset_to_defaults()
             elif args.randomize:
                 for op in fpe.ops.address:
-                    op.value = random.randrange(op.range_low, op.range_high, 0.000001)
+                    op.value = random.uniform(op.range_low, op.range_high)
             if args.set:
                 raw_set_parameters = [y for x in args.set
                                       for y in x.split('=')]
