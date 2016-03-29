@@ -16,7 +16,7 @@ def parse_expected_values_json(expected_values_json, operating_parameters):
         if expected_values_data[key]["value"] is "auto":
             assert key in operating_parameters, \
                 "Cannot automatically infer expected value for \"{key}\"".format(key=key)
-            expected_values_out[key]["value"] = operating_parameters["key"]
+            expected_values_out[key]["value"] = operating_parameters[key]
 
         assert "tolerance" in expected_values_data[key], \
             "No \"tolerance\" field for channel \"{key}\"".format(key=key)
