@@ -290,7 +290,7 @@ def values_to_5328(values):
     return map(lambda x, y: x + y, list(values), 16 * range(0, 8 * 4096, 4096))
 
 
-class OperatingParameters(dict):
+class OperatingParameters(object):
     def __init__(self, fpe=None, *args, **kwargs):
         import re
         from ..data.operating_parameters import default_operating_parameters
