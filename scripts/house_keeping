@@ -175,7 +175,7 @@ if __name__ == "__main__":
     from copy import deepcopy
     import argparse
     import sys
-    import re
+    import select
 
     # Parse the command line arguments
     parser = argparse.ArgumentParser(description='Get the analogue housekeeping data for specified parameters')
@@ -192,10 +192,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     with FPE(args.FPE_number, debug=args.debug) as fpe:
-        if args.expected_values_json is None:
-            expected_values = {}
-        else:
-            expected_values = parse_expected_values_json(args.expected_values_json, fpe.ops.values)
+        expected_values = {}
+        operating_parameter_values = fpe.ops.values
+        if args.expected_values_json is not None:
+            expected_values.update(parse_expected_values_json(args.expected_values_json, operating_parameter_values))
+        if select.select([args.json, ], [], [], 0.0)[0]:
+            expected_values.update(parse_expected_values_json(sys.stdin.name, operating_parameter_values))
 
         if args.channels:
             channels = match_channels(args.channels, housekeeping_channels.keys(), sort=args.sort)
