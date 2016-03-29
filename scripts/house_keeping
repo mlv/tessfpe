@@ -114,7 +114,7 @@ if __name__ == "__main__":
                 reported_values[k].append(hk["analogue"][k])
 
         print report_table(reported_values,
-                           expected_values=fpe.expected_housekeeping,
+                           #expected_values=fpe.expected_housekeeping,
                            keys=channels,
                            precision=args.precision)
         sys.exit(0)  # 0 is SUCCESS for shell commands
