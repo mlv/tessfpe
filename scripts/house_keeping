@@ -9,18 +9,20 @@ def parse_expected_values_json(expected_values_json, operating_parameters):
     from tessfpe.data.housekeeping_channels import housekeeping_channels
     with open(expected_values_json) as f:
         expected_values_data = json.load(f)
-    expected_values_out = deepcopy(expected_values_data)
+    output = {k: {} for k in expected_values_data}
     for key in expected_values_data:
         assert key in housekeeping_channels, "Unknown housekeeping channel \"{key}\"".format(key=key)
         assert "value" in expected_values_data[key], "No \"value\" field for channel \"{key}\"".format(key=key)
         if expected_values_data[key]["value"] is "auto":
             assert key in operating_parameters, \
                 "Cannot automatically infer expected value for \"{key}\"".format(key=key)
-            expected_values_out[key]["value"] = operating_parameters[key]
-        assert isinstance(expected_values_out[key]["value"], float), \
+            output[key]["value"] = operating_parameters[key]
+        else:
+            output[key]["value"] = expected_values_data[key]["value"]
+        assert isinstance(output[key]["value"], float), \
             "Expected value for key \"{key}\" must be a floating point number, was \"{value}\"".format(
                 key=key,
-                value=expected_values_out[key]["value"])
+                value=output[key]["value"])
 
         assert "tolerance" in expected_values_data[key], \
             "No \"tolerance\" field for channel \"{key}\"".format(key=key)
@@ -37,8 +39,10 @@ def parse_expected_values_json(expected_values_json, operating_parameters):
             percentage = int(tolerance[:-1])
             assert 0 <= percentage <= 100, "Cannot have tolerance be {percentage}%".format(percentage=percentage)
             total_range = abs(housekeeping_channels[key]["high"] - housekeeping_channels[key]["low"])
-            expected_values_out[key]["tolerance"] = float(percentage) / 100.0 * total_range
-    return expected_values_out
+            output[key]["tolerance"] = float(percentage) / 100.0 * total_range
+        else:
+            output[key]["tolerance"] = tolerance
+    return output
 
 
 def report_table(data, expected_vals={}, precision=4, keys=None):
