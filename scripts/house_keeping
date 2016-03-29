@@ -57,6 +57,8 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
     from tessfpe.data.housekeeping_channels import housekeeping_channels
     import numpy as np
     import pandas as pd
+    from pprint import pprint
+    pprint(expected_values)
     if not isinstance(expected_vals, dict):
         expected_vals = {}
     if keys is None:
