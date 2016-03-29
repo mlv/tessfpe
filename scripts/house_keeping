@@ -186,6 +186,7 @@ if __name__ == "__main__":
     import argparse
     import sys
     import select
+    from termcolor import colored
 
     # Parse the command line arguments
     parser = argparse.ArgumentParser(description='Get the analogue housekeeping data for specified parameters')
@@ -226,4 +227,9 @@ if __name__ == "__main__":
                                             keys=channels,
                                             precision=args.precision))
         print output
+        if " ok" in output or " FAIL" in output:
+            print
+            print "Housekeeping checks passed {}".format(colored('ok')) \
+                if ' ok' in output else \
+                colored("Housekeeping checks FAILED", 'red', attrs=['bold'])
         sys.exit(1 if 'FAIL' in output else 0)  # 0 is SUCCESS for shell commands
