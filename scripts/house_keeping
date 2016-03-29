@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """This script performs measurements of reference voltages to verify functionality."""
 
+
 def parse_expected_values_json(expected_values_json, operating_parameters):
     """Parse expected values from a json"""
     import json
@@ -36,13 +37,13 @@ def parse_expected_values_json(expected_values_json, operating_parameters):
     return expected_values_out
 
 
-def report_table(data, expected_values={}, precision=4, keys=None):
+def report_table(data, expected_vals={}, precision=4, keys=None):
     """Make a table (string) reporting the values of housekeeping data"""
     from tessfpe.data.housekeeping_channels import housekeeping_channels
     import numpy as np
     import pandas as pd
-    if not isinstance(expected_values, dict):
-        expected_values = {}
+    if not isinstance(expected_vals, dict):
+        expected_vals = {}
     if keys is None:
         keys = data.keys()
         keys.sort()
@@ -57,8 +58,8 @@ def report_table(data, expected_values={}, precision=4, keys=None):
             if len(set([len(v) for v in data.values()])) == 1 else u""
         report = pd.DataFrame(
             np.transpose(
-                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_values[j], units[j])
-                  if j in expected_values else "N/A" for j in keys],
+                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["value"], units[j])
+                  if j in expected_vals else "N/A" for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(np.average(data[j]), units[j])
                   for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(np.std(data[j]), units[j])
@@ -76,8 +77,8 @@ def report_table(data, expected_values={}, precision=4, keys=None):
         samples_text = u""
         report = pd.DataFrame(
             np.transpose(
-                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_values[j], units[j]) \
-                      if j in expected_values else "N/A"
+                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j], units[j]) \
+                      if j in expected_vals else "N/A"
                   for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(data[j], units[j])
                   for j in keys]]),
@@ -87,10 +88,9 @@ def report_table(data, expected_values={}, precision=4, keys=None):
             del report[u' Expected']
             report.columns = ['']
 
-    return samples_text + \
-           report.to_string(justify='left',
-                            formatters={col: u'{{:<{}s}}'.format(report[col].str.len().max()).format
-                                        for col in report.columns.values})
+    return samples_text + report.to_string(justify='left',
+                                           formatters={col: u'{{:<{}s}}'.format(report[col].str.len().max()).format
+                                                       for col in report.columns.values})
 
 
 def unique(ls):
@@ -156,7 +156,7 @@ if __name__ == "__main__":
                 reported_values[k].append(hk["analogue"][k])
 
         print report_table(reported_values,
-                           # expected_values=fpe.expected_housekeeping,
+                           expected_values,
                            keys=channels,
                            precision=args.precision)
         sys.exit(0)  # 0 is SUCCESS for shell commands
