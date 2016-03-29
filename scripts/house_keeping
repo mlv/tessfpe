@@ -141,7 +141,7 @@ if __name__ == "__main__":
         if args.expected_values_json is None:
             expected_values = {}
         else:
-            expected_values = parse_expected_values_json(args.expected_values_json, fpe.ops.values())
+            expected_values = parse_expected_values_json(args.expected_values_json, fpe.ops.values)
 
         if args.channels:
             channels = match_channels(args.channels, housekeeping_channels.keys(), sort=args.sort)
