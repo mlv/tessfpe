@@ -76,7 +76,11 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
         report = pd.DataFrame(
             np.transpose(
                 [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["value"], units[j])
-                  if j in expected_vals else "N/A" for j in keys],
+                  if j in expected_vals else "N/A"
+                  for j in keys],
+                 [(u"+/- {0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["tolerance"], units[j])
+                  if j in expected_vals else ""
+                  for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(np.average(data[j]), units[j])
                   for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(np.std(data[j]), units[j])
@@ -84,7 +88,7 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
                  [u"{0} {1}²".format(np.var(data[j]), units[j])
                   for j in keys]]),
             index=keys,
-            columns=[u' Expected', u' Average', u' STD', u' Variance'])
+            columns=[u' Expected', u' Tolerance', u' Average', u' STD', u' Variance'])
         # Variance is silly, don't worry about it
         del report[u' Variance']
 
@@ -94,15 +98,19 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
         samples_text = u""
         report = pd.DataFrame(
             np.transpose(
-                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["value"], units[j]) \
-                      if j in expected_vals else "N/A"
+                [[(u"{0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["value"], units[j])
+                  if j in expected_vals else "N/A"
+                  for j in keys],
+                 [(u"+/- {0:." + unicode(precision) + "f} {1}").format(expected_vals[j]["tolerance"], units[j])
+                  if j in expected_vals else ""
                   for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(data[j], units[j])
                   for j in keys]]),
             index=keys,
-            columns=[u' Expected', u' Actual'])
+            columns=[u' Expected', u' Tolerance', u' Actual'])
         if list(report[u' Expected'].unique()) == [u'N/A']:
             del report[u' Expected']
+            del report[u' Tolerance']
             report.columns = ['']
 
     return samples_text + report.to_string(justify='left',
