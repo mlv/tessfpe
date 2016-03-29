@@ -196,7 +196,7 @@ if __name__ == "__main__":
         operating_parameter_values = fpe.ops.values
         if args.expected_values_json is not None:
             expected_values.update(parse_expected_values_json(args.expected_values_json, operating_parameter_values))
-        if select.select([args.json, ], [], [], 0.0)[0]:
+        if select.select([sys.stdin, ], [], [], 0.0)[0]:
             expected_values.update(parse_expected_values_json(sys.stdin.name, operating_parameter_values))
 
         if args.channels:
