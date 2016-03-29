@@ -1,0 +1,318 @@
+{
+  "ccd1_backside": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_input_diode_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_input_diode_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_input_gate_1": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_input_gate_2": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_output_drain_a": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_output_drain_b": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_output_drain_c": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_output_drain_d": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_output_gate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_parallel_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_parallel_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_reauto_drain": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_reauto_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_reauto_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_scupper": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_serial_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_serial_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd1_substrate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_backside": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_input_diode_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_input_diode_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_input_gate_1": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_input_gate_2": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_output_drain_a": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_output_drain_b": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_output_drain_c": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_output_drain_d": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_output_gate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_parallel_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_parallel_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_reauto_drain": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_reauto_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_reauto_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_scupper": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_serial_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_serial_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd2_substrate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_backside": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_input_diode_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_input_diode_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_input_gate_1": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_input_gate_2": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_output_drain_a": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_output_drain_b": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_output_drain_c": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_output_drain_d": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_output_gate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_parallel_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_parallel_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_reauto_drain": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_reauto_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_reauto_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_scupper": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_serial_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_serial_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd3_substrate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_backside": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_input_diode_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_input_diode_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_input_gate_1": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_input_gate_2": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_output_drain_a": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_output_drain_b": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_output_drain_c": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_output_drain_d": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_output_gate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_parallel_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_parallel_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_reauto_drain": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_reauto_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_reauto_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_scupper": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_serial_high": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_serial_low": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "ccd4_substrate": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "heater_1_current": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "heater_2_current": {
+    "value": "auto",
+    "tolerance": "5%"
+  },
+  "heater_3_current": {
+    "value": "auto",
+    "tolerance": "5%"
+  }
+}
