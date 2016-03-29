@@ -17,10 +17,10 @@ def parse_expected_values_json(expected_values_json, operating_parameters):
             assert key in operating_parameters, \
                 "Cannot automatically infer expected value for \"{key}\"".format(key=key)
             expected_values_out[key]["value"] = operating_parameters[key]
-        assert isinstance(expected_values_out[k]["value"], float), \
+        assert isinstance(expected_values_out[key]["value"], float), \
             "Expected value for key \"{key}\" must be a floating point number, was \"{value}\"".format(
                 key=key,
-                value=expected_values_out[k]["value"])
+                value=expected_values_out[key]["value"])
 
         assert "tolerance" in expected_values_data[key], \
             "No \"tolerance\" field for channel \"{key}\"".format(key=key)
