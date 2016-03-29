@@ -3,13 +3,23 @@
 """This script performs measurements of reference voltages to verify functionality."""
 
 
+class JSONParseException(Exception):
+    pass
+
+
 def parse_expected_values_json(expected_values_json, operating_parameters):
     """Parse expected values from a json"""
     import json
     from tessfpe.data.housekeeping_channels import housekeeping_channels
-    with open(expected_values_json) as f:
-        expected_values_data = json.load(f)
-    output = {k: {} for k in expected_values_data}
+    expected_values_data = {}
+    if isinstance(expected_values_json, file):
+        expected_values_data.update(json.load(expected_values_json))
+    elif isinstance(expected_values_json, basestring):
+        with open(expected_values_json) as f:
+            expected_values_data.update(json.load(f))
+    else:
+        raise JSONParseException("Cannot parse object: {}".format(expected_values_json))
+    output = {key_name: {} for key_name in expected_values_data}
     for key in expected_values_data:
         assert key in housekeeping_channels, "Unknown housekeeping channel \"{key}\"".format(key=key)
         assert "value" in expected_values_data[key], "No \"value\" field for channel \"{key}\"".format(key=key)
@@ -146,6 +156,7 @@ def colorize_text(text):
         for line in text.split('\n')
     )
 
+
 def unique(ls):
     """Takes an iterable and returns a unique list of elements"""
     visited = set()
@@ -197,7 +208,7 @@ if __name__ == "__main__":
         if args.expected_values_json is not None:
             expected_values.update(parse_expected_values_json(args.expected_values_json, operating_parameter_values))
         if select.select([sys.stdin, ], [], [], 0.0)[0]:
-            expected_values.update(parse_expected_values_json(sys.stdin.name, operating_parameter_values))
+            expected_values.update(parse_expected_values_json(sys.stdin, operating_parameter_values))
 
         if args.channels:
             channels = match_channels(args.channels, housekeeping_channels.keys(), sort=args.sort)
