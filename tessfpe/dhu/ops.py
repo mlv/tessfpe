@@ -8,7 +8,14 @@ Usage
 To create an operating parameter object, type (for example):
 
 >>> op = OperatingParameter("ccd4_parallel_low", \
- {"address": 89, "high": -13.2, "low": 0.0, "range_high": -13.2, "range_low": 0.0, "unit": "V", "default": -5.0})
+ {"address": 89, \
+  "high": -13.2, \
+  "low": 0.0, \
+  "range_high": -13.2, \
+  "range_low": 0.0, \
+  "unit": "V", \
+  "relative_to": "", \
+  "default": -5.0})
 
 You can read the supplied info by simply accessing the values like so:
 
@@ -409,6 +416,7 @@ class OperatingParameters(dict):
 if __name__ == "__main__":
     import doctest
     from binary_files import write_clvmem
+    from sys import exit
 
-    doctest.testmod()
     print write_clvmem(values_to_5328(OperatingParameters().raw_values))
+    exit(0 if doctest.testmod().failed == 0 else 1)
