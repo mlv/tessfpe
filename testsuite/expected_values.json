@@ -47,15 +47,15 @@
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd1_output_drain": {
+  "ccd1_reset_drain": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd1_output_high": {
+  "ccd1_reset_high": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd1_output_low": {
+  "ccd1_reset_low": {
     "value": "auto",
     "tolerance": "5%"
   },
@@ -123,15 +123,15 @@
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd2_output_drain": {
+  "ccd2_reset_drain": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd2_output_high": {
+  "ccd2_reset_high": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd2_output_low": {
+  "ccd2_reset_low": {
     "value": "auto",
     "tolerance": "5%"
   },
@@ -199,15 +199,15 @@
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd3_output_drain": {
+  "ccd3_reset_drain": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd3_output_high": {
+  "ccd3_reset_high": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd3_output_low": {
+  "ccd3_reset_low": {
     "value": "auto",
     "tolerance": "5%"
   },
@@ -275,15 +275,15 @@
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd4_output_drain": {
+  "ccd4_reset_drain": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd4_output_high": {
+  "ccd4_reset_high": {
     "value": "auto",
     "tolerance": "5%"
   },
-  "ccd4_output_low": {
+  "ccd4_reset_low": {
     "value": "auto",
     "tolerance": "5%"
   },
