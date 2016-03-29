@@ -152,12 +152,18 @@ class OperatingParameter(object):
     @property
     def range_high(self):
         """The high value of the parameter"""
-        return self._info.range_high
+        if '_offset' in self.name:
+            return self.high
+        else:
+            return self._info.range_high
 
     @property
     def range_low(self):
         """The low value of the parameter"""
-        return self._info.range_low
+        if '_offset' in self.name:
+            return self.low
+        else:
+            return self._info.range_low
 
     @property
     def unit(self):
