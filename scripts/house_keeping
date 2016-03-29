@@ -86,14 +86,23 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
                  [(u"{0:." + unicode(precision) + "f} {1}").format(np.std(data[j]), units[j])
                   for j in keys],
                  [u"{0} {1}²".format(np.var(data[j]), units[j])
+                  for j in keys],
+                 [("ok" if all(expected_vals[j]["value"] - expected_vals[j]["tolerance"] <=
+                               datum <=
+                               expected_vals[j]["value"] + expected_vals[j]["tolerance"]
+                               for datum in data[j])
+                   else "FAIL")
+                  if j in expected_vals else ""
                   for j in keys]]),
             index=keys,
-            columns=[u' Expected', u' Tolerance', u' Average', u' STD', u' Variance'])
+            columns=[u' Expected', u' Tolerance', u' Average', u' STD', u' Variance', u' Status'])
         # Variance is silly, don't worry about it
         del report[u' Variance']
 
         if list(report[u' Expected'].unique()) == [u'N/A']:
             del report[u' Expected']
+            del report[u' Tolerance']
+            del report[u' Status']
     else:
         samples_text = u""
         report = pd.DataFrame(
