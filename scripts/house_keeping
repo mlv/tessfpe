@@ -149,11 +149,10 @@ def colorize_text(text):
     :return: str
     """
     from termcolor import colored
-    return "\n".join(
-        line.replace(' ok', colored(' ok', 'green')) if ' ok' in line else
-        (colored(line, 'red', attrs=['bold']) if ' FAIL' in line else line)
-        for line in text.split('\n')
-    )
+    ordinary_lines = '\n'.join(line.replace(' ok', colored(' ok', 'green'))
+                               for line in text.splitlines() if ' FAIL' not in line)
+    failure_lines = '\n'.join(colored(line, 'red', attrs=['bold']) for line in text.splitlines() if ' FAIL' in line)
+    return '\n'.join([ordinary_lines, failure_lines])
 
 
 def unique(ls):
