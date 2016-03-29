@@ -108,7 +108,7 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
                   for j in keys],
                  [("ok" if expected_vals[j]["value"] - expected_vals[j]["tolerance"] <=
                            data[j] <=
-                           expected_vals[j]["value"] - expected_vals[j]["tolerance"] else "FAIL")
+                           expected_vals[j]["value"] + expected_vals[j]["tolerance"] else "FAIL")
                   if j in expected_vals else ""
                   for j in keys]]),
             index=keys,
