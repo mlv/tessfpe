@@ -1,11 +1,11 @@
 {
   "ccd1_backside": {
-    "value": "auto",
-    "tolerance": "5%"
+    "value": 0,
+    "tolerance": 0.1
   },
   "ccd1_input_diode_high": {
     "value": "auto",
-    "tolerance": "5%"
+    "tolerance": 0.2
   },
   "ccd1_input_diode_low": {
     "value": "auto",
