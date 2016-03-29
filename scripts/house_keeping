@@ -230,6 +230,7 @@ if __name__ == "__main__":
         if " ok" in output or " FAIL" in output:
             print
             print "Housekeeping checks passed {}".format(colored('ok', 'green')) \
-                if ' ok' in output else \
+                if ' FAIL' not in output else \
                 colored("Housekeeping checks FAILED", 'red', attrs=['bold'])
-        sys.exit(1 if 'FAIL' in output else 0)  # 0 is SUCCESS for shell commands
+            print
+        sys.exit(1 if ' FAIL' in output else 0)  # 0 is SUCCESS for shell commands
