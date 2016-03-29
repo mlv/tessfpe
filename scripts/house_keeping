@@ -105,12 +105,18 @@ def report_table(data, expected_vals={}, precision=4, keys=None):
                   if j in expected_vals else ""
                   for j in keys],
                  [(u"{0:." + unicode(precision) + "f} {1}").format(data[j], units[j])
+                  for j in keys],
+                 [("ok" if expected_vals[j]["value"] - expected_vals[j]["tolerance"] <=
+                           data[j] <=
+                           expected_vals[j]["value"] - expected_vals[j]["tolerance"] else "FAIL")
+                  if j in expected_vals else ""
                   for j in keys]]),
             index=keys,
-            columns=[u' Expected', u' Tolerance', u' Actual'])
+            columns=[u' Expected', u' Tolerance', u' Actual', u' Status'])
         if list(report[u' Expected'].unique()) == [u'N/A']:
             del report[u' Expected']
             del report[u' Tolerance']
+            del report[u' Status']
             report.columns = ['']
 
     return samples_text + report.to_string(justify='left',
