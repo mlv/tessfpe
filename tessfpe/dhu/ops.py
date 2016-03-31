@@ -123,31 +123,31 @@ class OperatingParameter(object):
     """An operating parameter object for the FPE Data Handling Unit (DHU) object"""
 
     def __init__(self, name, info):
-        self._info = OperatingParameterInfo(name=name, **info)
+        self.info = OperatingParameterInfo(name=name, **info)
         self._twelve_bit_value = None
         self._value = None
-        self.value = self._info.default
+        self.value = self.info.default
 
     # Delegation Pattern https://en.wikipedia.org/wiki/Delegation_pattern
     @property
     def name(self):
         """The name of the parameter"""
-        return self._info.name
+        return self.info.name
 
     @property
     def address(self):
         """The address of the parameter"""
-        return self._info.address
+        return self.info.address
 
     @property
     def high(self):
         """The high value of the parameter"""
-        return self._info.high
+        return self.info.high
 
     @property
     def low(self):
         """The low value of the parameter"""
-        return self._info.low
+        return self.info.low
 
     @property
     def range_high(self):
@@ -155,7 +155,7 @@ class OperatingParameter(object):
         if '_offset' in self.name:
             return self.high
         else:
-            return self._info.range_high
+            return self.info.range_high
 
     @property
     def range_low(self):
@@ -163,17 +163,17 @@ class OperatingParameter(object):
         if '_offset' in self.name:
             return self.low
         else:
-            return self._info.range_low
+            return self.info.range_low
 
     @property
     def unit(self):
         """The units of the parameter"""
-        return self._info.unit
+        return self.info.unit
 
     @property
     def default(self):
         """The default value of the parameter"""
-        return self._info.default
+        return self.info.default
 
     # Set the value, do bounds checks
     @property
@@ -245,10 +245,10 @@ class DerivedOperatingParameter(object):
 
     @property
     def low(self):
-        actual_offset_low = self._offset.low \
-            if self._offset.low <= self._offset.high else self._offset.high
-        actual_offset_range_low = self._offset.range_low \
-            if self._offset.range_low <= self._offset.range_high else self._offset.range_high
+        actual_offset_low = self._offset.info.low \
+            if self._offset.info.low <= self._offset.info.high else self._offset.info.high
+        actual_offset_range_low = self._offset.info.range_low \
+            if self._offset.info.range_low <= self._offset.info.range_high else self._offset.info.range_high
         return max(self._base.value + actual_offset_low, actual_offset_range_low)
 
     @property
@@ -257,10 +257,10 @@ class DerivedOperatingParameter(object):
 
     @property
     def high(self):
-        actual_offset_high = self._offset.high \
-            if self._offset.low <= self._offset.high else self._offset.low
-        actual_offset_range_high = self._offset.range_high \
-            if self._offset.range_low <= self._offset.range_high else self._offset.range_low
+        actual_offset_high = self._offset.info.high \
+            if self._offset.info.low <= self._offset.info.high else self._offset.info.low
+        actual_offset_range_high = self._offset.info.range_high \
+            if self._offset.info.range_low <= self._offset.info.range_high else self._offset.info.range_low
         return min(self._base.value + actual_offset_high, actual_offset_range_high)
 
     @property
