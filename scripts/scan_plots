@@ -14,6 +14,7 @@ STEPS=${STEPS-20}
 
 OUTPUT_PDF=${OUTPUT_PDF-"/tmp/summary-$(uuidgen | tr [:lower:] [:upper:]).pdf"}
 OUTPUT_PDF_SET=0
+FPE_NUMBER=1
 DEBUG=1
 
 if [[ "$*" =~ "--help" ]] ; then
@@ -29,6 +30,7 @@ optional arguments:
   --quiet                     turn off verbose output
   --samples-per-step          how many samples to take for each step of the scan
   --steps                     how many steps to take in the scan
+  --FPE-number                which FPE to use
 EOF
        exit 0
 fi
@@ -41,6 +43,10 @@ for key in "$@" ; do
        ;;
        --quiet)
        DEBUG=0
+       shift
+       ;;
+       --FPE-number)
+       FPE_NUMBER=$2
        shift
        ;;
        --steps)
@@ -79,7 +85,7 @@ fi
 SCAN_PLOT_DIR=$(mktemp -d /tmp/scan_plots.XXXXXXXXXX)
 
 function _scan_plot {
-  ${PYTHON} ${DIR}/scan_plot --steps ${STEPS} --samples-per-step ${SAMPLES_PER_STEP} --output ${SCAN_PLOT_DIR} $*
+  ${PYTHON} ${DIR}/scan_plot --steps ${STEPS} --samples-per-step ${SAMPLES_PER_STEP} --output ${SCAN_PLOT_DIR} --FPE-number ${FPE_NUMBER} $*
 }
 
 function scan_plot {
