@@ -1,27 +1,52 @@
 .PHONY: install
 BLAS_VERSION=3.6.0
+VIRTUAL_ENV_VERSION=15.0.1
+PYTHON_VERSION=2.7.11
 
 all: install
 
-.venv-clean: .venv-clean/src/BLAS
-	virtualenv -p $(shell which python2.7) $@
-	.venv-clean/bin/pip install --upgrade pip
-	BLAS_SRC=.venv-clean/src/BLAS .venv-clean/bin/pip install -r requirements.txt
+install: venv/src/BLAS venv/local/bin/python2.7 venv/local/bin/virtualenv
+	BLAS_SRC=venv/src/BLAS venv/local/bin/pip install -q -r requirements.txt
+	[ -f venv/bin/python2.7 ] || venv/local/bin/virtualenv --system-site-packages -p venv/local/bin/python2.7 venv
+	venv/bin/pip install --upgrade pip
+	make -C .. testsuite_install
 
-venv: .venv-clean
-	.venv-clean/bin/virtualenv-clone $< $@
+venv/local/:
+	mkdir -p $@
 
-.venv-clean/src/BLAS:
-	mkdir -p .venv-clean/src
-	(cd .venv-clean/src ; \
+venv/src/Python:
+	mkdir -p $(dir $@)
+	(cd $(dir $@); \
+	 rm -rf $(notdir $@) ; \
+	 curl https://www.python.org/ftp/python/$(PYTHON_VERSION)/Python-$(PYTHON_VERSION).tgz | tar zxfv - ; \
+	 rm -rf $@ ; \
+         ln -s $(notdir $@)-$(PYTHON_VERSION) $(notdir $@))
+
+venv/local/bin/python2.7: venv/src/Python venv/local/
+	(cd $< ; \
+	 ./configure --prefix=$(CURDIR)/venv/local/ ; \
+	 make install)
+	touch $@
+
+venv/local/bin/pip: venv/local/bin/python2.7
+	curl https://bootstrap.pypa.io/get-pip.py -o - | $<
+	touch $@
+
+venv/local/bin/virtualenv: venv/local/bin/pip
+	$< install $(notdir $@)
+
+venv/src/BLAS:
+	mkdir -p $(dir $@)
+	(cd $(dir $@); \
+	 rm -rf $(notdir $@); \
          curl http://www.netlib.org/blas/blas-$(BLAS_VERSION).tgz | tar zxfv - ; \
-         ln -s BLAS-$(BLAS_VERSION) BLAS)
+	 rm -rf $@ ; \
+         ln -s $(notdir $@)-$(BLAS_VERSION) $(notdir $@))
 
-install:
-	make -C .. install_testsuite
 
 reinstall:
-	make -C .. reinstall_testsuite
+	rm -rf venv/{bin,lib,include,pip-selfcheck.json}
+	make install
 
 clean:
-	rm -rf .venv-clean/ venv/
+	rm -rf venv/
