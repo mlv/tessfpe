@@ -12,7 +12,7 @@ testsuite_install: install_testsuite
 
 install_testsuite: setup.py testsuite/venv tessfpe/sequencer_dsl/SequencerDSLParser.py
 	@[ -d testsuite/venv/lib/python2.7/site-packages/tessfpe-*.egg ] \
-        || testsuite/venv/bin/python setup.py install
+        || LD_LIBRARY_PATH="$(CURDIR)/testsuite/venv/local/lib:$(CURDIR)/testsuite/venv/local/lib64" testsuite/venv/bin/python setup.py install
 
 reinstall_testsuite:
 	rm -rf testsuite/venv
