@@ -7,8 +7,8 @@ voltage_reference_values = {
     "+1f": 1,
     "+2.5f": 2.5,
     "+3.3f": 3.3,
-    "+5": 5,
-    "-12": -12
+#    "-12": -12,
+    "+5": 5
 }
 
 temperature_sensor_calibration_values = {
