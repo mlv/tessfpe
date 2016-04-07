@@ -19,7 +19,7 @@ reinstall_testsuite:
 	make install_testsuite
 
 testsuite/venv:
-	make -C testsuite venv
+	make -C testsuite reinstall
 
 test:
 	python2.7 -m tessfpe.dhu.ops
