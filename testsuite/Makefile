@@ -7,6 +7,7 @@ OPENSSL_VERSION=1.0.2g
 all: install
 
 install: venv/src/BLAS venv/local/bin/python2.7 venv/local/bin/virtualenv
+	LD_LIBRARY_PATH="$(CURDIR)/venv/local/lib:$(CURDIR)/venv/local/lib64" venv/local/bin/pip install --upgrade setuptools
 	LD_LIBRARY_PATH="$(CURDIR)/venv/local/lib:$(CURDIR)/venv/local/lib64" \
         BLAS_SRC=venv/src/BLAS venv/local/bin/pip install -q -r requirements.txt
 	[ -f venv/bin/python2.7 ] || LD_LIBRARY_PATH="$(CURDIR)/venv/local/lib:$(CURDIR)/venv/local/lib64" \
@@ -59,6 +60,7 @@ venv/local/bin/python2.7: venv/src/Python venv/local/lib/libssl.a
 
 venv/local/bin/pip: venv/local/bin/python2.7
 	curl https://bootstrap.pypa.io/get-pip.py -o - | LD_LIBRARY_PATH="$(CURDIR)/venv/local/lib:$(CURDIR)/venv/local/lib64" $<
+	LD_LIBRARY_PATH="$(CURDIR)/venv/local/lib:$(CURDIR)/venv/local/lib64" venv/local/bin/pip install --upgrade setuptools
 	touch $@
 
 venv/local/bin/virtualenv: venv/local/bin/pip
