@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import subprocess
 import glob
-VERSION = subprocess.check_output(["git", "describe", "--tags", "--always"]).rstrip()
+VERSION = "6.2.6"
 setup (
   name = 'tessfpe',
   packages = find_packages(),
