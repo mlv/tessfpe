@@ -22,14 +22,14 @@ if __name__ == "__main__":
                 print "Frames are running {0}".format(colored("ok", 'green'))
                 sys.exit(0)
             if args.check_not_running is True:
-                print >> sys.stderr, colored(u"{1} {0}".format("X", "Frames are running when they should not"), 'red',
-                                             attrs=['bold'])
+                print >> sys.stderr, colored(u"{1} {0}".format("FAIL", "Frames are running when they should not"),
+                                             'red', attrs=['bold'])
                 sys.exit(1)
             print "Frames are running",
         else:
             if args.check_running is True:
-                print >> sys.stderr, colored(u"{1} {0}".format("X", "Frames are *NOT* running when they should"), 'red',
-                                             attrs=['bold'])
+                print >> sys.stderr, colored(u"{1} {0}".format("FAIL", "Frames are *NOT* running when they should"),
+                                             'red', attrs=['bold'])
                 sys.exit(1)
             if args.check_not_running is True:
                 print "Frames are not running {0}".format(colored("ok", 'green'))

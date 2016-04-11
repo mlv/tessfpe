@@ -8,7 +8,14 @@ Usage
 To create an operating parameter object, type (for example):
 
 >>> op = OperatingParameter("ccd4_parallel_low", \
- {"address": 89, "high": -13.2, "low": 0.0, "range_high": -13.2, "range_low": 0.0, "unit": "V", "default": -5.0})
+ {"address": 89, \
+  "high": -13.2, \
+  "low": 0.0, \
+  "range_high": -13.2, \
+  "range_low": 0.0, \
+  "unit": "V", \
+  "relative_to": "", \
+  "default": -5.0})
 
 You can read the supplied info by simply accessing the values like so:
 
@@ -116,51 +123,57 @@ class OperatingParameter(object):
     """An operating parameter object for the FPE Data Handling Unit (DHU) object"""
 
     def __init__(self, name, info):
-        self._info = OperatingParameterInfo(name=name, **info)
+        self.info = OperatingParameterInfo(name=name, **info)
         self._twelve_bit_value = None
         self._value = None
-        self.value = self._info.default
+        self.value = self.info.default
 
     # Delegation Pattern https://en.wikipedia.org/wiki/Delegation_pattern
     @property
     def name(self):
         """The name of the parameter"""
-        return self._info.name
+        return self.info.name
 
     @property
     def address(self):
         """The address of the parameter"""
-        return self._info.address
+        return self.info.address
 
     @property
     def high(self):
         """The high value of the parameter"""
-        return self._info.high
+        return self.info.high
 
     @property
     def low(self):
         """The low value of the parameter"""
-        return self._info.low
+        return self.info.low
 
     @property
     def range_high(self):
         """The high value of the parameter"""
-        return self._info.range_high
+        if '_offset' in self.name:
+            return self.high
+        else:
+            return self.info.range_high
 
     @property
     def range_low(self):
         """The low value of the parameter"""
-        return self._info.range_low
+        if '_offset' in self.name:
+            return self.low
+        else:
+            return self.info.range_low
 
     @property
     def unit(self):
         """The units of the parameter"""
-        return self._info.unit
+        return self.info.unit
 
     @property
     def default(self):
         """The default value of the parameter"""
-        return self._info.default
+        return self.info.default
 
     # Set the value, do bounds checks
     @property
@@ -175,7 +188,7 @@ class OperatingParameter(object):
         if actual_high <= actual_low:
             (actual_low, actual_high) = (actual_high, actual_low)
         epsilon = 10**-5
-        if not (actual_low - epsilon <= x <= actual_high + epsilon):
+        if not (actual_low - epsilon) <= x <= (actual_high + epsilon):
             raise Exception("Attempting to set value out of bounds.\n" +
                             "value: {}\n".format(x) +
                             "name: {}\n".format(self.name) +
@@ -232,7 +245,11 @@ class DerivedOperatingParameter(object):
 
     @property
     def low(self):
-        return max(self._base.value + self._offset.low, self._offset.range_low)
+        actual_offset_low = self._offset.info.low \
+            if self._offset.info.low <= self._offset.info.high else self._offset.info.high
+        actual_offset_range_low = self._offset.info.range_low \
+            if self._offset.info.range_low <= self._offset.info.range_high else self._offset.info.range_high
+        return max(self._base.value + actual_offset_low, actual_offset_range_low)
 
     @property
     def range_low(self):
@@ -240,7 +257,11 @@ class DerivedOperatingParameter(object):
 
     @property
     def high(self):
-        return min(self._base.value + self._offset.high, self._offset.range_high)
+        actual_offset_high = self._offset.info.high \
+            if self._offset.info.low <= self._offset.info.high else self._offset.info.low
+        actual_offset_range_high = self._offset.info.range_high \
+            if self._offset.info.range_low <= self._offset.info.range_high else self._offset.info.range_low
+        return min(self._base.value + actual_offset_high, actual_offset_range_high)
 
     @property
     def range_high(self):
@@ -275,7 +296,7 @@ def values_to_5328(values):
     return map(lambda x, y: x + y, list(values), 16 * range(0, 8 * 4096, 4096))
 
 
-class OperatingParameters(dict):
+class OperatingParameters(object):
     def __init__(self, fpe=None, *args, **kwargs):
         import re
         from ..data.operating_parameters import default_operating_parameters
@@ -401,6 +422,7 @@ class OperatingParameters(dict):
 if __name__ == "__main__":
     import doctest
     from binary_files import write_clvmem
+    from sys import exit
 
-    doctest.testmod()
     print write_clvmem(values_to_5328(OperatingParameters().raw_values))
+    exit(0 if doctest.testmod().failed == 0 else 1)

@@ -75,6 +75,17 @@ def plot_data_to_pdf(parameter_name, measurement_data, filename=None):
     return filename
 
 
+def rrange(start, end, steps):
+    """
+    Create a generator which steps from start to end with 'steps' many steps
+    :param start: float
+    :param end: float
+    :param steps: int
+    :return: generator
+    """
+    return ((start * (steps - 1 - i) + end * i) / float(steps - 1) for i in range(steps))
+
+
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
     import argparse
@@ -95,9 +106,6 @@ if __name__ == "__main__":
     parser.add_argument('--steps', metavar='N', type=int, nargs='?', default=100,
                         help='The number of steps to take as the operating parameter is walked from its low value '
                              'to its high value (default is 100)')
-    parser.add_argument('--step-size', metavar='N', type=int, nargs='?', default=None,
-                        help="The size of a step to take as the operating parameter is walked from its low value "
-                             "to its high value; overrides '--steps'")
     parser.add_argument('--samples-per-step', metavar='N', type=int, nargs='?', default=5,
                         help="The number of samples to take for each value the operating parameter is stepped to "
                              "(default is 5)")
@@ -131,12 +139,10 @@ if __name__ == "__main__":
             assert high_value <= actual_range_high, "Value {high_value} out of range; " \
                                                     "highest value is {high}".format(high=actual_range_high,
                                                                                      high_value=high_value)
-            step_size = args.step_size if args.step_size is not None \
-                else np.abs(high_value - low_value) / (args.steps - 1)
             if args.set_defaults is True:
                 fpe.ops.reset_to_defaults()
             measurements = {}
-            for value in np.arange(low_value, high_value + step_size, step_size):
+            for value in rrange(low_value, high_value, args.steps):
                 fpe.ops[parameter].value = value
                 fpe.ops.send()
                 measurements[value] = []

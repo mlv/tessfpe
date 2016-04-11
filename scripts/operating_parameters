@@ -7,6 +7,7 @@ if __name__ == "__main__":
     import argparse
     import json
     import select
+    import random
 
     parser = argparse.ArgumentParser(
         description='Manage the operating parameters for the DHU.\n\nIf no argument is given, prints the current status of the operating parameters.\n\nExit status indicates if operating parameters are in acceptable range.')
@@ -17,6 +18,8 @@ if __name__ == "__main__":
                         help="Set operating parameters by specifying pairs of values, e.g. 'ccd4_reset_low=15.0'")
     parser.add_argument('--set-defaults', action='store_true',
                         help='Set the operating parameters to their default values')
+    parser.add_argument('--randomize', action='store_true',
+                        help='Set the operating parameters to random values in their range')
     parser.add_argument('--debug', action='store_true', help='Enable debugging output')
     args = parser.parse_args()
 
@@ -33,6 +36,10 @@ if __name__ == "__main__":
                 fpe.ops.send()
             elif args.set_defaults:
                 fpe.ops.reset_to_defaults()
+            elif args.randomize:
+                for op in fpe.ops.address:
+                    if op is not None:
+                        op.value = random.uniform(op.range_low, op.range_high)
             if args.set:
                 raw_set_parameters = [y for x in args.set
                                       for y in x.split('=')]

@@ -10,6 +10,7 @@ from data import read_data_tsv
 
 defaults = {v: float(k) for v, k in read_data_tsv("DefaultParameters.tsv")}
 
+
 def get_operating_parameters(tsv_file_name):
     "Extract the operating parameters from a data TSV file"
     return {line[1].lower().replace(' ', '_'):

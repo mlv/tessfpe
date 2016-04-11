@@ -1,10 +1,7 @@
 #!/bin/bash
 
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
-set -eo pipefail
-# WARNING: Bash 4.1 exposes no way of safely determining if a variable is not set
-# If you upgrade to Bash 4.2, you can uncomment the following line, and another in the `login` function
-#set -u
+set -ueo pipefail
 IFS=$'\n\t'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 RED="$(tput setaf 1)"
@@ -39,10 +36,7 @@ function pretty_print_outlet_status {
 function login {
   if [[ -z "$(outlet_status)" ]] ; then
      rm -f ${DIR}/.curl_cookie
-     # WARNING: If you have bash 4.2, you can do this
-     # if [[ -v PASSWORD ]] ; then
-     # Instead we do something less safe
-     if [[ -z "$PASSWORD" ]] ; then
+     if [[ -z ${PASSWORD-} ]] ; then
         echo -n "Password: "
         read -s PASSWORD
         echo
@@ -113,16 +107,16 @@ function turn_switches_off {
   pretty_print_outlet_status
 }
 
-if [[ $@ == "--help" ]] || [[ $@ == "-h" ]]; then
+if [[ "$*" =~ "--help" ]]; then
        cat <<EOF
-usage: $0 [-h] [--off] [--on] [--reset]
+usage: $0 [--help] [--off] [--on] [--reset]
 
 Control the hardware power switch attached to the Observatory Simulator.
 
 If no argument is given, prints the status of the switch.
 
 optional arguments:
-  -h, --help                  show this help message and exit
+  --help                      show this help message and exit
   --on                        turn on specified switches
   --on-all, --all-on          turn on all switches
   --off                       turn off specified switches
