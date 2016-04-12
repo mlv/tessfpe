@@ -23,7 +23,7 @@ setup (
   download_url = 'https://github.com/TESScience/tessfpe/tarball/{VERSION}'.format(VERSION=VERSION),
   scripts = glob.glob('scripts/*'),
   install_requires=[
-      'grako>=3.6.3',
+      'grako==3.6.7',
       'pandas>=0.17.1',
       'sh>=1.11',
       'matplotlib>=1.5.0',
