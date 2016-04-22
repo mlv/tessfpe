@@ -16,8 +16,8 @@ tessfpe: .tessfpe-clean
 	.tessfpe-clean/bin/virtualenv-clone $< $@
 
 .tessfpe-clean/src/BLAS:
-	mkdir -p $(dir $<)
-	(cd $(dir $<) ; \
+	mkdir -p $(dir $@)
+	(cd $(dir $@) ; \
 	 curl http://www.netlib.org/blas/blas-$(BLAS_VERSION).tgz | tar zxfv - ; \
 	 ln -s BLAS-$(BLAS_VERSION) BLAS)
 

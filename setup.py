@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 import subprocess
 import glob
-VERSION = "6.2.9"
+VERSION = "6.2.10"
 setup (
   name = 'tessfpe',
   packages = find_packages(),
