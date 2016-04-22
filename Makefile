@@ -10,16 +10,17 @@ tessfpe/sequencer_dsl/SequencerDSLParser.py:
 
 testsuite_install: install_testsuite
 
-install_testsuite: setup.py testsuite/venv tessfpe/sequencer_dsl/SequencerDSLParser.py
-	@[ -d testsuite/venv/lib/python2.7/site-packages/tessfpe-*.egg ] \
-        || LD_LIBRARY_PATH="$(CURDIR)/testsuite/venv/local/lib:$(CURDIR)/testsuite/venv/local/lib64" testsuite/venv/bin/python setup.py install
+install_testsuite: setup.py testsuite/tessfpe tessfpe/sequencer_dsl/SequencerDSLParser.py
+	@[ -d testsuite/tessfpe/lib/python2.7/site-packages/tessfpe-*.egg ] \
+        || LD_LIBRARY_PATH="$(CURDIR)/testsuite/tessfpe/local/lib:$(CURDIR)/testsuite/tessfpe/local/lib64" testsuite/tessfpe/bin/python setup.py install
+	make -C testsuite/venv
 
 reinstall_testsuite:
-	rm -rf testsuite/venv
+	rm -rf testsuite/tessfpe
 	make install_testsuite
 
-testsuite/venv:
-	make -C testsuite venv
+testsuite/tessfpe:
+	make -C testsuite tessfpe
 
 test:
 	python2.7 -m tessfpe.dhu.ops
