@@ -88,7 +88,7 @@ class FPE(object):
 
     def load_wrapper(self,
                      fpe_wrapper_binary=None,
-                     wrapper_version='6.2.3',
+                     wrapper_version='6.2.4',
                      force=False,
                      dhu_reset=False):
         """
