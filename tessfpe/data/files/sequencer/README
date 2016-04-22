@@ -25,3 +25,14 @@ WeHideAndSeek:
 Like UpAndRunning, but with reversed parallel clocks for room temperature testing.
 
 
+-------------------------------------------------------------------------------------
+
+BlueRondo:
+
+Like UpAndRunning, but injects charge into the lowest "smear" row.
+
+-------------------------------------------------------------------------------------
+
+UfoTofu:
+
+Attempts to flatten bias by sloshing charge back and forth in the serials for 32 pixel cycles after a parallel to serial transfer.
