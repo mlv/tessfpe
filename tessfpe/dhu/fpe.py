@@ -48,6 +48,7 @@ class FPE(object):
         self._reset_in_progress = False
         self._loading_wrapper = False
         self.fpe_number = number
+        assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         self.connection = FPESocketConnection(5554 + number, self._debug)
 
         # self.ops implemented with lazy getter
@@ -171,9 +172,10 @@ class FPE(object):
         import re
         import os.path
         assert os.path.isfile(file_name), "Could not find file for TFTP upload: {}".format(file_name)
+        assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         tftp_mode = "mode binary"
-        tftp_port = "connect 192.168.100.1 {}".format(68 + self.fpe_number)
-        tftp_file = "put {} {}".format(file_name, destination)
+        tftp_port = "connect 192.168.100.1 69"
+        tftp_file = "put {} {}{}".format(file_name, destination, "2" if self.fpe_number is 2 else "")
         tftp_command = "\n" + tftp_mode + "\n" + tftp_port + "\n" + tftp_file
 
         status = self.frames_running_status
