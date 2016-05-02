@@ -5,7 +5,7 @@ all: tessfpe/sequencer_dsl/SequencerDSLParser.py
 version:
 	@echo $(VERSION)
 
-tessfpe/sequencer_dsl/SequencerDSLParser.py: 
+tessfpe/sequencer_dsl/SequencerDSLParser.py:
 	make -C $(dir $@) $(notdir $@)
 
 testsuite_install: install_testsuite
@@ -15,6 +15,8 @@ install_testsuite: setup.py testsuite/tessfpe tessfpe/sequencer_dsl/SequencerDSL
         || LD_LIBRARY_PATH="$(CURDIR)/testsuite/tessfpe/local/lib:$(CURDIR)/testsuite/tessfpe/local/lib64" testsuite/tessfpe/bin/python setup.py install
 	# For legacy people who don't want this to change on them
 	make -C testsuite venv
+
+testsuite_reinstall: reinstall_testsuite
 
 reinstall_testsuite:
 	rm -rf testsuite/tessfpe
