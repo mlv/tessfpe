@@ -16,7 +16,7 @@ if __name__ == "__main__":
     import argparse
     import sys
 
-    default_binary_version = "6.2.3"
+    default_binary_version = "6.2.4"
 
     parser = argparse.ArgumentParser(description='Load the FPE wrapper')
     parser.add_argument('fpe_wrapper_binary', nargs='?', type=str, default=None,
