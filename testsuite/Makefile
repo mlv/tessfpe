@@ -14,6 +14,7 @@ venv: tessfpe
 
 tessfpe: .tessfpe-clean
 	.tessfpe-clean/bin/virtualenv-clone $< $@
+	touch $@
 
 .tessfpe-clean/src/BLAS:
 	mkdir -p $(dir $@)
