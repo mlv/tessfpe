@@ -428,7 +428,7 @@ class FPE(object):
         return self.tftp_put(
             fpe_wrapper_bin,
             "bitmem" + str(self.fpe_number),
-            timeout=5)
+            timeout=16)
 
     def upload_sequencer_memory(self, sequencer_memory):
         """Upload the Sequencer Memory to the FPE"""
