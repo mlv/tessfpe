@@ -165,7 +165,7 @@ class FPE(object):
         """Exit the python object, used for context management.  See: https://www.python.org/dev/peps/pep-0343/"""
         return self.close()
 
-    def tftp_put(self, file_name, destination, timeout=0.1, retries=8):
+    def tftp_put(self, file_name, destination, timeout=1, retries=8):
         """Upload a file to the FPE"""
         from sh import tftp, ErrorReturnCode_1
         import re
@@ -182,7 +182,7 @@ class FPE(object):
 
         status = self.frames_running_status
         t = None
-        sleep_time = 0.5
+        sleep_time = .5
 
         try:
             if self._debug:
@@ -427,7 +427,8 @@ class FPE(object):
         """
         return self.tftp_put(
             fpe_wrapper_bin,
-            "bitmem" + str(self.fpe_number))
+            "bitmem" + str(self.fpe_number),
+            timeout=5)
 
     def upload_sequencer_memory(self, sequencer_memory):
         """Upload the Sequencer Memory to the FPE"""
