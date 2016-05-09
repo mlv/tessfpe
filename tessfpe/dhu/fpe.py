@@ -5,7 +5,6 @@ import os
 import house_keeping
 import binary_files
 
-
 # Class used for forcing an FPE wrapper to be loaded
 class ForcedWrapperLoad(Exception):
     pass
@@ -166,11 +165,14 @@ class FPE(object):
         """Exit the python object, used for context management.  See: https://www.python.org/dev/peps/pep-0343/"""
         return self.close()
 
-    def tftp_put(self, file_name, destination):
+    def tftp_put(self, file_name, destination, timeout=0.1, retries=8):
         """Upload a file to the FPE"""
         from sh import tftp, ErrorReturnCode_1
         import re
         import os.path
+        from time import sleep
+        from fpesocketconnection import TimeOut, TimeOutError
+
         assert os.path.isfile(file_name), "Could not find file for TFTP upload: {}".format(file_name)
         assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         tftp_mode = "mode binary"
@@ -179,25 +181,36 @@ class FPE(object):
         tftp_command = "\n" + tftp_mode + "\n" + tftp_port + "\n" + tftp_file
 
         status = self.frames_running_status
+        t = None
+        sleep_time = 0.5
+
         try:
             if self._debug:
                 print "Running:\ntftp <<EOF\n", \
                     tftp_command, "\n", \
                     "EOF"
             self.frames_running_status = False
-            try:
-                tftp(_in=tftp_command)
-            except ErrorReturnCode_1 as e:
-                # tftp *always* fails on OS X because it's awesome
-                # so just check that it reports in stdout it sent the thing
-                if self._debug:
-                    print e
-                if not re.match(r'Sent [0-9]+ bytes in [0-9]+\.[0-9]+ seconds',
-                                e.stdout):
-                    raise e
-            # Wait for the fpe to report the load is complete
-            self.connection.wait_for_pattern(r'.*Load complete\n\r')
-            return True
+            for trial in range(retries):
+                try:
+                    with TimeOut(seconds=timeout,
+                                 error_message="Timeout on trial {}".format(trial + 1)):
+                        try:
+                            tftp(_in=tftp_command)
+                        except ErrorReturnCode_1 as e:
+                            # tftp *always* fails on OS X because it's awesome
+                            # so just check that it reports in stdout it sent the thing
+                            if self._debug:
+                                print e
+                            if not re.match(r'Sent [0-9]+ bytes in [0-9]+\.[0-9]+ seconds',
+                                            e.stdout):
+                                raise e
+                        # Wait for the fpe to report the load is complete
+                        self.connection.wait_for_pattern(r'.*Load complete\n\r')
+                        return True
+                except TimeOutError as e:
+                    sleep(sleep_time * 2**trial)
+                    t = e
+            raise t
         finally:
             self.frames_running_status = status
 
