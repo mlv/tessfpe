@@ -232,6 +232,10 @@ class FPE(object):
             register_memory = os.path.join(self._dir, 'MemFiles', 'Reg.bin')
             assert self.upload_register_memory(register_memory), \
                 'Could not load register memory: {}'.format(register_memory)
+            # Set the housekeeping memory to the identity map
+            house_keeping_memory = binary_files.write_hskmem(house_keeping.identity_map)
+            assert self.upload_housekeeping_memory(house_keeping_memory), \
+                "Could not load house keeping memory: {}".format(house_keeping_memory)
         if sanity_checks:
             check_house_keeping_voltages(self)
         self._reset_in_progress = False
@@ -359,6 +363,15 @@ class FPE(object):
         from ..sequencer_dsl.program import compile_programs
         from ..sequencer_dsl.sequence import compile_sequences
         from ..sequencer_dsl.parse import parse_file
+        from ..data.data import data_dir
+        import os.path
+        data_dir_fpe_program = os.path.join(data_dir, 'sequencer', program)
+        if os.path.isfile(data_dir_fpe_program):
+            program = data_dir_fpe_program
+        else:
+            data_dir_fpe_program_fpe = os.path.join(data_dir, 'sequencer', program + ".fpe")
+            if os.path.isfile(data_dir_fpe_program_fpe):
+                program = data_dir_fpe_program_fpe
         ast = parse_file(program)
         sequencer_byte_code = binary_files.write_seqmem(compile_sequences(ast))
         program_byte_code = binary_files.write_prgmem(compile_programs(ast))
