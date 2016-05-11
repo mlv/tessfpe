@@ -13,6 +13,7 @@ ${PYTHON} ${DIR}/venv/bin/load_wrapper --help
 ${PYTHON} ${DIR}/venv/bin/load_wrapper 6.1t.4 --force
 ${PYTHON} ${DIR}/venv/bin/load_wrapper
 ${PYTHON} ${DIR}/venv/bin/load_wrapper --dhu-reset
+${PYTHON} ${DIR}/venv/bin/frames_running_status --check-not-running
 ${PYTHON} ${DIR}/venv/bin/house_keeping --help
 ${PYTHON} ${DIR}/venv/bin/house_keeping
 ${PYTHON} ${DIR}/venv/bin/house_keeping --samples 20 --channels pt1000_sensor_*
