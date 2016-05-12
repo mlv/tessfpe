@@ -6,7 +6,6 @@ import house_keeping
 import binary_files
 
 
-# Class used for forcing an FPE wrapper to be loaded
 class ForcedWrapperLoad(Exception):
     pass
 
@@ -48,6 +47,7 @@ class FPE(object):
         self._reset_in_progress = False
         self._loading_wrapper = False
         self.fpe_number = number
+        assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         self.connection = FPESocketConnection(5554 + number, self._debug)
 
         # self.ops implemented with lazy getter
@@ -88,7 +88,7 @@ class FPE(object):
 
     def load_wrapper(self,
                      fpe_wrapper_binary=None,
-                     wrapper_version='6.2.3',
+                     wrapper_version='6.2.4',
                      force=False,
                      dhu_reset=False):
         """
@@ -165,43 +165,59 @@ class FPE(object):
         """Exit the python object, used for context management.  See: https://www.python.org/dev/peps/pep-0343/"""
         return self.close()
 
-    def tftp_put(self, file_name, destination):
+    def tftp_put(self, file_name, destination, timeout=1, retries=8):
         """Upload a file to the FPE"""
         from sh import tftp, ErrorReturnCode_1
         import re
         import os.path
+        from time import sleep
+        from fpesocketconnection import TimeOut, TimeOutError
+
         assert os.path.isfile(file_name), "Could not find file for TFTP upload: {}".format(file_name)
+        assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         tftp_mode = "mode binary"
-        tftp_port = "connect 192.168.100.1 {}".format(68 + self.fpe_number)
-        tftp_file = "put {} {}".format(file_name, destination)
+        tftp_port = "connect 192.168.100.1 69"
+        tftp_file = "put {} {}{}".format(file_name, destination, "2" if self.fpe_number is 2 else "")
         tftp_command = "\n" + tftp_mode + "\n" + tftp_port + "\n" + tftp_file
 
         status = self.frames_running_status
+        t = None
+        sleep_time = .5
+
         try:
             if self._debug:
                 print "Running:\ntftp <<EOF\n", \
                     tftp_command, "\n", \
                     "EOF"
             self.frames_running_status = False
-            try:
-                tftp(_in=tftp_command)
-            except ErrorReturnCode_1 as e:
-                # tftp *always* fails on OS X because it's awesome
-                # so just check that it reports in stdout it sent the thing
-                if self._debug:
-                    print e
-                if not re.match(r'Sent [0-9]+ bytes in [0-9]+\.[0-9]+ seconds',
-                                e.stdout):
-                    raise e
-            # Wait for the fpe to report the load is complete
-            self.connection.wait_for_pattern(r'.*Load complete\n\r')
-            return True
+            for trial in range(retries):
+                try:
+                    with TimeOut(seconds=timeout,
+                                 error_message="Timeout on trial {}".format(trial + 1)):
+                        try:
+                            tftp(_in=tftp_command)
+                        except ErrorReturnCode_1 as e:
+                            # tftp *always* fails on OS X because it's awesome
+                            # so just check that it reports in stdout it sent the thing
+                            if self._debug:
+                                print e
+                            if not re.match(r'Sent [0-9]+ bytes in [0-9]+\.[0-9]+ seconds',
+                                            e.stdout):
+                                raise e
+                        # Wait for the fpe to report the load is complete
+                        self.connection.wait_for_pattern(r'.*Load complete\n\r')
+                        return True
+                except TimeOutError as e:
+                    sleep(sleep_time * 2**trial)
+                    t = e
+            raise t
         finally:
             self.frames_running_status = status
 
     def cam_reset(self, upload=True, sanity_checks=True):
         """Reset the camera after running frames"""
-        from unit_tests import check_house_keeping_voltages
+        from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
+        from fpesocketconnection import TimeOutError
         if self._reset_in_progress:
             return False
         self._reset_in_progress = True
@@ -217,8 +233,16 @@ class FPE(object):
             register_memory = os.path.join(self._dir, 'MemFiles', 'Reg.bin')
             assert self.upload_register_memory(register_memory), \
                 'Could not load register memory: {}'.format(register_memory)
+            # Set the housekeeping memory to the identity map
+            house_keeping_memory = binary_files.write_hskmem(house_keeping.identity_map)
+            assert self.upload_housekeeping_memory(house_keeping_memory), \
+                "Could not load house keeping memory: {}".format(house_keeping_memory)
         if sanity_checks:
-            check_house_keeping_voltages(self)
+            # Try checking the housekeeping memory.  If it's bad, give reloading the wrapper
+            try:
+                check_house_keeping_voltages(self)
+            except (TimeOutError, UnexpectedHousekeeping):
+                self.load_wrapper()
         self._reset_in_progress = False
         return True
 
@@ -344,6 +368,15 @@ class FPE(object):
         from ..sequencer_dsl.program import compile_programs
         from ..sequencer_dsl.sequence import compile_sequences
         from ..sequencer_dsl.parse import parse_file
+        from ..data.data import data_dir
+        import os.path
+        data_dir_fpe_program = os.path.join(data_dir, 'sequencer', program)
+        if os.path.isfile(data_dir_fpe_program):
+            program = data_dir_fpe_program
+        else:
+            data_dir_fpe_program_fpe = os.path.join(data_dir, 'sequencer', program + ".fpe")
+            if os.path.isfile(data_dir_fpe_program_fpe):
+                program = data_dir_fpe_program_fpe
         ast = parse_file(program)
         sequencer_byte_code = binary_files.write_seqmem(compile_sequences(ast))
         program_byte_code = binary_files.write_prgmem(compile_programs(ast))
@@ -412,7 +445,8 @@ class FPE(object):
         """
         return self.tftp_put(
             fpe_wrapper_bin,
-            "bitmem" + str(self.fpe_number))
+            "bitmem" + str(self.fpe_number),
+            timeout=16)
 
     def upload_sequencer_memory(self, sequencer_memory):
         """Upload the Sequencer Memory to the FPE"""

@@ -5,21 +5,25 @@ all: tessfpe/sequencer_dsl/SequencerDSLParser.py
 version:
 	@echo $(VERSION)
 
-tessfpe/sequencer_dsl/SequencerDSLParser.py: 
+tessfpe/sequencer_dsl/SequencerDSLParser.py:
 	make -C $(dir $@) $(notdir $@)
 
 testsuite_install: install_testsuite
 
-install_testsuite: setup.py testsuite/venv tessfpe/sequencer_dsl/SequencerDSLParser.py
-	@[ -d testsuite/venv/lib/python2.7/site-packages/tessfpe-*.egg ] \
-        || LD_LIBRARY_PATH="$(CURDIR)/testsuite/venv/local/lib:$(CURDIR)/testsuite/venv/local/lib64" testsuite/venv/bin/python setup.py install
+install_testsuite: setup.py testsuite/tessfpe tessfpe/sequencer_dsl/SequencerDSLParser.py
+	@[ -d testsuite/tessfpe/lib/python2.7/site-packages/tessfpe-*.egg ] \
+        || LD_LIBRARY_PATH="$(CURDIR)/testsuite/tessfpe/local/lib:$(CURDIR)/testsuite/tessfpe/local/lib64" testsuite/tessfpe/bin/python setup.py install
+	# For legacy people who don't want this to change on them
+	make -C testsuite venv
+
+testsuite_reinstall: reinstall_testsuite
 
 reinstall_testsuite:
-	rm -rf testsuite/venv
+	rm -rf testsuite/tessfpe
 	make install_testsuite
 
-testsuite/venv:
-	make -C testsuite venv
+testsuite/tessfpe:
+	make -C testsuite tessfpe
 
 test:
 	python2.7 -m tessfpe.dhu.ops

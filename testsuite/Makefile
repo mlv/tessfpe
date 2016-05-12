@@ -3,25 +3,30 @@ BLAS_VERSION=3.6.0
 
 all: install
 
-.venv-clean: .venv-clean/src/BLAS
-		virtualenv -p $(shell which python2.7) $@
-			.venv-clean/bin/pip install --upgrade pip
-				BLAS_SRC=.venv-clean/src/BLAS .venv-clean/bin/pip install -r requirements.txt
+.tessfpe-clean: .tessfpe-clean/src/BLAS
+	virtualenv -p $(shell which python2.7) $@
+	.tessfpe-clean/bin/pip install --upgrade pip
+	BLAS_SRC=.tessfpe-clean/src/BLAS .tessfpe-clean/bin/pip install -r requirements.txt
 
-venv: .venv-clean
-		.venv-clean/bin/virtualenv-clone $< $@
+venv: tessfpe
+	rm -f $@
+	ln -s $< $@
 
-.venv-clean/src/BLAS:
-		mkdir -p .venv-clean/src
-			(cd .venv-clean/src ; \
-				         curl http://www.netlib.org/blas/blas-$(BLAS_VERSION).tgz | tar zxfv - ; \
-					          ln -s BLAS-$(BLAS_VERSION) BLAS)
+tessfpe: .tessfpe-clean
+	.tessfpe-clean/bin/virtualenv-clone $< $@
+	touch $@
+
+.tessfpe-clean/src/BLAS:
+	mkdir -p $(dir $@)
+	(cd $(dir $@) ; \
+	 curl http://www.netlib.org/blas/blas-$(BLAS_VERSION).tgz | tar zxfv - ; \
+	 ln -s BLAS-$(BLAS_VERSION) BLAS)
 
 install:
-		make -C .. install_testsuite
+	make -C .. install_testsuite
 
 reinstall:
-		make -C .. reinstall_testsuite
+	make -C .. reinstall_testsuite
 
 clean:
-		rm -rf .venv-clean/ venv/
+	rm -rf .tessfpe-clean/ tessfpe/ venv/

@@ -8,7 +8,7 @@ It also performs basic housekeeping voltage measurements to verify functionality
 Before running this script, the Observatory Simulator should be power-cycled. When you are running this script and the ObsSim has not been power cycled, you should set preload=False.
 """
 
-FPE_Wrapper_versions = ['6.1.1', '6.0.5772', '6.1t.1', '6.1.4', '6.1t.4', '6.1.5', '6.1t.5', '6.2.3']
+FPE_Wrapper_versions = ['6.1.1', '6.0.5772', '6.1t.1', '6.1.4', '6.1t.4', '6.1.5', '6.1t.5', '6.2.4']
 
 if __name__ == "__main__":
     from tessfpe.dhu.fpe import FPE
@@ -16,7 +16,7 @@ if __name__ == "__main__":
     import argparse
     import sys
 
-    default_binary_version = "6.2.3"
+    default_binary_version = "6.2.4"
 
     parser = argparse.ArgumentParser(description='Load the FPE wrapper')
     parser.add_argument('fpe_wrapper_binary', nargs='?', type=str, default=None,
