@@ -5,7 +5,7 @@ import os
 import house_keeping
 import binary_files
 
-# Class used for forcing an FPE wrapper to be loaded
+
 class ForcedWrapperLoad(Exception):
     pass
 
@@ -216,7 +216,8 @@ class FPE(object):
 
     def cam_reset(self, upload=True, sanity_checks=True):
         """Reset the camera after running frames"""
-        from unit_tests import check_house_keeping_voltages
+        from unit_tests import check_house_keeping_voltages, UnexpectedHousekeeping
+        from fpesocketconnection import TimeOutError
         if self._reset_in_progress:
             return False
         self._reset_in_progress = True
@@ -237,7 +238,11 @@ class FPE(object):
             assert self.upload_housekeeping_memory(house_keeping_memory), \
                 "Could not load house keeping memory: {}".format(house_keeping_memory)
         if sanity_checks:
-            check_house_keeping_voltages(self)
+            # Try checking the housekeeping memory.  If it's bad, give reloading the wrapper
+            try:
+                check_house_keeping_voltages(self)
+            except (TimeOutError, UnexpectedHousekeeping):
+                self.load_wrapper()
         self._reset_in_progress = False
         return True
 
