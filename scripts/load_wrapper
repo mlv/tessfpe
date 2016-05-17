@@ -31,21 +31,30 @@ if __name__ == "__main__":
     parser.add_argument('--force', action='store_true', help='Force (re)load the wrapper')
     parser.add_argument('--dhu-reset', action='store_true', help='Reset the DHU before loading')
     args = parser.parse_args()
+    EXIT_CODE = 1
     try:
         if args.fpe_wrapper_binary is not None:
             assert args.wrapper_version in FPE_Wrapper_versions, \
                 "FPE Wrapper version must be one of {0} (was set to '{1}')".format(
                     FPE_Wrapper_versions, args.wrapper_version)
         with FPE(args.FPE_number, debug=args.debug, sanity_checks=False) as fpe:
-            print u"{1} {0}".format(colored("ok", 'green'),
-                                    fpe.load_wrapper(
-                                        fpe_wrapper_binary=args.fpe_wrapper_binary,
-                                        wrapper_version=args.wrapper_version,
-                                        force=args.force,
-                                        dhu_reset=args.dhu_reset))
-            sys.exit(0)
+            status = None
+            try:
+                status = fpe.frames_running_status
+                fpe.cam_stop_frames()
+                print u"{1} {0}".format(colored("ok", 'green'),
+                                        fpe.load_wrapper(
+                                            fpe_wrapper_binary=args.fpe_wrapper_binary,
+                                            wrapper_version=args.wrapper_version,
+                                            force=args.force,
+                                            dhu_reset=args.dhu_reset))
+            finally:
+                EXIT_CODE = 0 if status is not None else 1
+                if status is not None:
+                    fpe.frames_running_status = status
     except Exception as e:
         if args.debug:
             raise
         print >> sys.stderr, colored(u"{1}: {2} {0}".format("FAIL", type(e).__name__, e), 'red', attrs=['bold'])
-        sys.exit(1)
+    finally:
+        sys.exit(EXIT_CODE)
