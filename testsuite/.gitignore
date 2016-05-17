@@ -1,3 +1,5 @@
-venv/
+venv
+tessfpe/
+.tessfpe-clean/
 .venv-clean/
 *.bin
