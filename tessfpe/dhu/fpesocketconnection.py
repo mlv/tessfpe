@@ -26,11 +26,11 @@ class TimeOut:
 class FPESocketConnection(object):
     """An object for encapsulating an open socket connection with the Observatory Simulator"""
 
-    def __init__(self, port, debug=False):
+    def __init__(self, port, fpe_hostname, debug=False):
         import socket
         self.port = port
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, 0)
-        self.socket.connect(('192.168.100.1', int(self.port)))
+        self.socket.connect((fpe_hostname, int(self.port)))
         self._debug = debug
         self.get_prompt()
 
