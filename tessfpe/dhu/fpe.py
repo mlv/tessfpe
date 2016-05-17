@@ -10,10 +10,10 @@ class ForcedWrapperLoad(Exception):
     pass
 
 
-def ping():
+def ping(hostname):
     """Ping the Observation Simulator to make sure it is alive"""
     from sh import ping
-    out = ping('-c', '1', '-t', '1', '192.168.100.1')
+    out = ping('-c', '1', '-t', '1', hostname)
 
     return ('1 packets transmitted, 1 packets received' in str(out) or  # MacOSX
             '1 packets transmitted, 1 received' in str(out))  # Centos
@@ -29,6 +29,9 @@ def reverse_bytes32(n):
     return reduce(lambda x, i: x + (((n >> 8 * i) & 0xFF) << (8 * (3 - i))), range(4), 0)
 
 
+DEFAULT_FPE_HOSTNAME = "192.168.100.1"
+
+
 class FPE(object):
     """An object for interacting with an FPE in an Observatory Simulator"""
 
@@ -38,17 +41,20 @@ class FPE(object):
                  sanity_checks=True,
                  auto_load=True):
         from fpesocketconnection import FPESocketConnection
+        import os
+
+        self.FPE_HOSTNAME = os.environ["FPE_HOSTNAME"] if "FPE_HOSTNAME" in os.environ else DEFAULT_FPE_HOSTNAME
 
         # First sanity check: ping the observatory simulator
-        if not ping():
-            raise Exception("Cannot ping 192.168.100.1")
+        if not ping(DEFAULT_FPE_HOSTNAME):
+            raise Exception("Cannot ping " + DEFAULT_FPE_HOSTNAME)
         self._debug = debug
         self._dir = os.path.dirname(os.path.realpath(__file__))
         self._reset_in_progress = False
         self._loading_wrapper = False
         self.fpe_number = number
-        assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
-        self.connection = FPESocketConnection(5554 + number, self._debug)
+        assert self.fpe_number in [1, 2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
+        self.connection = FPESocketConnection(5554 + number, self.FPE_HOSTNAME, self._debug)
 
         # self.ops implemented with lazy getter
         self._ops = None
@@ -174,9 +180,9 @@ class FPE(object):
         from fpesocketconnection import TimeOut, TimeOutError
 
         assert os.path.isfile(file_name), "Could not find file for TFTP upload: {}".format(file_name)
-        assert self.fpe_number in [1,2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
+        assert self.fpe_number in [1, 2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         tftp_mode = "mode binary"
-        tftp_port = "connect 192.168.100.1 69"
+        tftp_port = "connect {FPE_HOSTNAME} 69".format(FPE_HOSTNAME=DEFAULT_FPE_HOSTNAME)
         tftp_file = "put {} {}{}".format(file_name, destination, "2" if self.fpe_number is 2 else "")
         tftp_command = "\n" + tftp_mode + "\n" + tftp_port + "\n" + tftp_file
 
@@ -208,7 +214,7 @@ class FPE(object):
                         self.connection.wait_for_pattern(r'.*Load complete\n\r')
                         return True
                 except TimeOutError as e:
-                    sleep(sleep_time * 2**trial)
+                    sleep(sleep_time * 2 ** trial)
                     t = e
             raise t
         finally:
@@ -242,6 +248,7 @@ class FPE(object):
             try:
                 check_house_keeping_voltages(self)
             except (TimeOutError, UnexpectedHousekeeping):
+                self._reset_in_progress = False
                 self.load_wrapper()
         self._reset_in_progress = False
         return True
