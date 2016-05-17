@@ -377,13 +377,14 @@ class FPE(object):
         from ..sequencer_dsl.parse import parse_file
         from ..data.data import data_dir
         import os.path
-        data_dir_fpe_program = os.path.join(data_dir, 'sequencer', program)
-        if os.path.isfile(data_dir_fpe_program):
-            program = data_dir_fpe_program
-        else:
-            data_dir_fpe_program_fpe = os.path.join(data_dir, 'sequencer', program + ".fpe")
-            if os.path.isfile(data_dir_fpe_program_fpe):
-                program = data_dir_fpe_program_fpe
+        if not hasattr(program, 'read'):
+            data_dir_fpe_program = os.path.join(data_dir, 'sequencer', program)
+            if os.path.isfile(data_dir_fpe_program):
+                program = data_dir_fpe_program
+            else:
+                data_dir_fpe_program_fpe = os.path.join(data_dir, 'sequencer', program + ".fpe")
+                if os.path.isfile(data_dir_fpe_program_fpe):
+                    program = data_dir_fpe_program_fpe
         ast = parse_file(program)
         sequencer_byte_code = binary_files.write_seqmem(compile_sequences(ast))
         program_byte_code = binary_files.write_prgmem(compile_programs(ast))
