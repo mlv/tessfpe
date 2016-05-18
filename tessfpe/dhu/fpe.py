@@ -29,7 +29,8 @@ def reverse_bytes32(n):
     return reduce(lambda x, i: x + (((n >> 8 * i) & 0xFF) << (8 * (3 - i))), range(4), 0)
 
 
-DEFAULT_FPE_HOSTNAME = "192.168.100.1"
+DEFAULT_FPE_HOSTNAME = "observatorysim"
+DEFAULT_TFTP_HOSTNAME = "192.168.100.1"
 
 
 class FPE(object):
@@ -46,8 +47,8 @@ class FPE(object):
         self.FPE_HOSTNAME = os.environ["FPE_HOSTNAME"] if "FPE_HOSTNAME" in os.environ else DEFAULT_FPE_HOSTNAME
 
         # First sanity check: ping the observatory simulator
-        if not ping(DEFAULT_FPE_HOSTNAME):
-            raise Exception("Cannot ping " + DEFAULT_FPE_HOSTNAME)
+        if not ping(self.FPE_HOSTNAME):
+            raise Exception("Cannot ping " + self.FPE_HOSTNAME)
         self._debug = debug
         self._dir = os.path.dirname(os.path.realpath(__file__))
         self._reset_in_progress = False
@@ -182,7 +183,7 @@ class FPE(object):
         assert os.path.isfile(file_name), "Could not find file for TFTP upload: {}".format(file_name)
         assert self.fpe_number in [1, 2], "FPE number must be either 1 or 2, was {}".format(self.fpe_number)
         tftp_mode = "mode binary"
-        tftp_port = "connect {FPE_HOSTNAME} 69".format(FPE_HOSTNAME=DEFAULT_FPE_HOSTNAME)
+        tftp_port = "connect {TFTP_HOSTNAME} 69".format(TFTP_HOSTNAME=DEFAULT_TFTP_HOSTNAME)
         tftp_file = "put {} {}{}".format(file_name, destination, "2" if self.fpe_number is 2 else "")
         tftp_command = "\n" + tftp_mode + "\n" + tftp_port + "\n" + tftp_file
 
