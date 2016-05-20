@@ -1,4 +1,4 @@
-This repo has moved to gitolite3@tessdev.mit.edu
+This repo has moved to a private server at MIT.
 
 Focal Plane Electronics Software Testing for TESS
 -------------------------------------------------
