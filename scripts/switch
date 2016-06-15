@@ -2,6 +2,7 @@
 
 # http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -ueo pipefail
+HOST=powersupply
 IFS=$'\n\t'
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 RED="$(tput setaf 1)"
@@ -12,7 +13,7 @@ ALL_SWITCHES=$(seq 1 6)
 
 # Use curl to try to get the status of the reset board and process its HTML
 function outlet_status {
-  curl -s --cookie ${CURL_COOKIE} 192.168.0.100/index.htm | \
+  curl -s --cookie ${CURL_COOKIE} $HOST/index.htm | \
   tr "\n" "|" | \
   grep -o "<tr bgcolor=\"\#FFFFFF\">.*</td></tr>" | \
   sed -e 's/|//g' \
@@ -41,7 +42,7 @@ function login {
         read -s PASSWORD
         echo
      fi 
-     curl -s -d "Username=tess" -d "Password=${PASSWORD}" --cookie-jar ${CURL_COOKIE} 192.168.0.100/login.tgi > /dev/null
+     curl -s -d "Username=tess" -d "Password=${PASSWORD}" --cookie-jar ${CURL_COOKIE} $HOST/login.tgi > /dev/null
      if [ -z "$(outlet_status)" ] ; then
         echo "${RED}LOGIN FAILED ✗${RESET}" > /dev/stderr
         exit 1
@@ -50,11 +51,11 @@ function login {
 }
 
 function turn_switch_on {
-  curl -s --cookie ${CURL_COOKIE} 192.168.0.100/outlet?${1}=ON > /dev/null
+  curl -s --cookie ${CURL_COOKIE} $HOST/outlet?${1}=ON > /dev/null
 }
 
 function turn_switch_off {
-  curl -s --cookie ${CURL_COOKIE} 192.168.0.100/outlet?${1}=OFF > /dev/null
+  curl -s --cookie ${CURL_COOKIE} $HOST/outlet?${1}=OFF > /dev/null
 }
 
 function get_arguments {
