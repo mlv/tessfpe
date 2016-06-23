@@ -35,4 +35,37 @@ Like UpAndRunning, but injects charge into the lowest "smear" row.
 
 UfoTofu:
 
-Attempts to flatten bias by sloshing charge back and forth in the serials for 32 pixel cycles after a parallel to serial transfer.
+Reversed parallel clocks. Attempts to flatten bias by sloshing charge back and forth in the serials for 32 pixel cycles after a parallel to serial transfer.
+
+-------------------------------------------------------------------------------------
+
+Lateralus:
+
+Similar to UfoTofu. Reversed parallel clocks. UfoTofu moves charge forward/back 8 pixels two times. Lateralus moves it forward/back two pixels 8 times.
+
+Lateralus2:
+
+Asserts Clamp and RG during slosh for better measurement chain stability. Currently preferred reversed clocking sequence.
+
+-------------------------------------------------------------------------------------
+
+TakeFive:
+
+Similar to DolphinDance.
+
+Charge injection enabled. It injects charge into the first five "smear rows". It does not attempt to settle the start of line ringing.
+
+-------------------------------------------------------------------------------------
+
+GimmeFive:
+
+Five equally spaced rows of charge injection.
+
+-------------------------------------------------------------------------------------
+
+Hemiola:
+
+Based on Lateralus2, but with forward parallel clocks. No charge injection, and operates the upper serial with all gates low all the time. Current flight candidate.
+
+
+

@@ -1,0 +1,253 @@
+/*
+
+Bias flateness test using reverse parallel clocks.
+
+Attempts to flatten bias by sloshing charge back and forth in the serials for 32 pixel cycles after a parallel to serial transfer.
+
+Integrates in P1-IA and P2-IA. Holds charge in P2-FS.
+	
+Defaults to a disabled measurement chain with charge queued in P2-OR and P3-OR.
+
+Charge injection disabled. Upper serials wide open in hopes that this gives the reversed
+clocked image charge somewhere to go.
+
+*/
+
+defaults {
+    P1-IA-1 high P2-IA-1 high P3-IA-1 low
+    P1-IA-2 high P2-IA-2 high P3-IA-2 low
+    P1-IA-3 high P2-IA-3 high P3-IA-3 low
+    P1-IA-4 high P2-IA-4 high P3-IA-4 low
+    P1-FS-1 low P2-FS-1 high P3-FS-1 low
+    P1-FS-2 low P2-FS-2 high P3-FS-2 low
+    P1-FS-3 low P2-FS-3 high P3-FS-3 low
+    P1-FS-4 low P2-FS-4 high P3-FS-4 low
+    P1-OR low P2-OR high P3-OR high
+    P1-U low P2-U low P3-U low
+    RG high ID high
+    Int low DeInt low Clamp high CNV low
+}
+
+/*
+
+Pixel cycle. We also use this for flushing, with the no_data program option.
+
+*/
+
+sequence pixcycle {
+    Clamp low				/* Override the default */
+    CNV high step			/* 0 Start conversion of pixel in pipeline */
+    Clamp high step			/* 1 Reset analog chain */
+    RG low step				/* 2 Allow charge sense */
+    P2-OR low step			/* 3 Push chage to P3 */
+    step				/* 4 */
+    Clamp low step			/* 5 Enable integration */
+    DeInt high step			/* 6 Start measuring baseline */
+    P1-OR high step			/* 7 Begin to move next pixel charge */
+    CNV low step			/* 8 Start ADC readout */
+    step				/* 9 */
+    step				/* 10 */
+    P3-OR low step			/* 11 Push charge to sense node */
+    DeInt low step			/* 12 Done measuring baseline */
+    step				/* 13 */
+    step				/* 14 */
+    P2-OR high Int high step		/* 15 Start measuring charge */
+    step				/* 16 */
+    step				/* 17 */
+    step				/* 18 */
+    step				/* 19 */
+    P1-OR low step			/* 20 Delayed to avoid crosstalk */
+    Int low step			/* 21 Done measuring charge */
+    RG high step			/* 22 Clear charge from charge sense */
+    P3-OR high step			/* 23 Next pixel charge queued up */
+    }
+
+/*
+
+Backward pixel. This clocks the measurement chains as in a pixel, but clocks the serial
+registers backwards. The intent is to imitate the power drain of pixcycle without
+actually reading out pixels. We use this after a parallel-serial transfer to help the
+video power supplies return to equilibrium before we read out pixels.
+
+*/
+
+sequence elcycxip {
+    Clamp low				
+    CNV high step			
+    Clamp high step			
+    step		/*    RG low step */		
+    P3-OR low step			
+    step
+    step	/*    Clamp low step */		
+    DeInt high step			
+    P1-OR high step			
+    CNV low step			
+    step				
+    step				
+    P2-OR low step			
+    DeInt low step			
+    step				
+    step				
+    P3-OR high Int high step		
+    step				
+    step				
+    step				
+    RG low step		/*    step */				
+    P1-OR low step			
+    Int low step			
+    RG high step			
+    P2-OR high step			
+    }
+
+
+/*
+
+This fr2serial has P1-OR high, P2-OR high, and P3-OR low when P3-FS is high, so the
+transfer is straight down the column. It then moves charge over to P2/P3 to "prime the
+pump" for a subsequent pixcycle. It does no measurement chain clocking. The program
+should follow this with a no_data pixcycle to move the information through the
+measurement chain to the ADC input.
+
+Leaves with the next rows in P2-FS, the next pixels in P2-OR and P3-OR.
+
+Reverse clocking version, P1-FS, P3-FS exchanged.
+
+*/
+
+sequence fr2serial {
+    P3-OR low		/* block charge motion between columns */
+    step(12)
+    P1-OR high		/* accept charge into both P1-OR and P2-OR */
+    P3-FS-1 high P3-FS-2 high P3-FS-3 high P3-FS-4 high	/* open P3-FS for transfer */
+    step(24)
+    P2-FS-1 low P2-FS-2 low P2-FS-3 low P2-FS-4 low	/* push charge to P3-FS */
+    step(24)
+    P1-FS-1 high P1-FS-2 high P1-FS-3 high P1-FS-4 high	/* allow next row into P1-FS */
+    step(24)
+    P3-FS-1 low P3-FS-2 low P3-FS-3 low P3-FS-4 low	/* push charge to OR */
+    step(24)
+    P1-OR low		/* first pump priming step */
+    P2-FS-1 high P2-FS-2 high P2-FS-3 high P2-FS-4 high	/* next row to P2 */
+    step(24)
+    P3-OR high		/* final pump priming, OR charge in P2 and P3 */
+    P1-FS-1 low P1-FS-2 low P1-FS-3 low P1-FS-4 low	/* FS charge in P2 only */
+    step(12)
+}
+
+/* 
+
+Single row transfers for reverse frame transfer operation, per-chip. This version opens
+the upper serial register to make it as receptive as possible to charge. Junk charge
+from the IA should bloom horizontally.
+
+Switches P1 and P2 for reverse transfers.
+
+*/
+
+sequence rowtransfer1 {
+    P1-OR high			/* override default, leave OR wide open */
+    P1-IA-1 low P1-FS-1 low
+    step(24)
+    P3-IA-1 high P3-FS-1 high
+    step(24)
+    P2-IA-1 low P2-FS-1 low
+    step(24)
+    P1-IA-1 high P1-FS-1 high
+    step(24)
+    P3-IA-1 low P3-FS-1 low
+    step(24)
+    P2-IA-1 high P2-FS-1 high
+    step(24)    
+}
+
+sequence rowtransfer2 {
+    P1-OR high			/* override default, leave OR wide open */
+    P1-IA-2 low P1-FS-2 low
+    step(24)
+    P3-IA-2 high P3-FS-2 high
+    step(24)
+    P2-IA-2 low P2-FS-2 low
+    step(24)
+    P1-IA-2 high P1-FS-2 high
+    step(24)
+    P3-IA-2 low P3-FS-2 low
+    step(24)
+    P2-IA-2 high P2-FS-2 high
+    step(24)    
+}
+
+sequence rowtransfer3 {
+    P1-OR high			/* override default, leave OR wide open */
+    P1-IA-3 low P1-FS-3 low
+    step(24)
+    P3-IA-3 high P3-FS-3 high
+    step(24)
+    P2-IA-3 low P2-FS-3 low
+    step(24)
+    P1-IA-3 high P1-FS-3 high
+    step(24)
+    P3-IA-3 low P3-FS-3 low
+    step(24)
+    P2-IA-3 high P2-FS-3 high
+    step(24)    
+}
+
+sequence rowtransfer4 {
+    P1-OR high			/* override default, leave OR wide open */
+    P1-IA-4 low P1-FS-4 low
+    step(24)
+    P3-IA-4 high P3-FS-4 high
+    step(24)
+    P2-IA-4 low P2-FS-4 low
+    step(24)
+    P1-IA-4 high P1-FS-4 high
+    step(24)
+    P3-IA-4 low P3-FS-4 low
+    step(24)
+    P2-IA-4 high P2-FS-4 high
+    step(24)    
+}
+parameter rows = 2078;
+parameter columns = 534;
+parameter slosh = 2;		/* range 1-2 for 16-32 settling cycles */
+
+/*
+The sequencer program.
+*/
+
+no_data ( rows ) rowtransfer1;
+no_data ( rows ) rowtransfer2;
+no_data ( rows ) rowtransfer3;
+no_data ( rows ) rowtransfer4;
+
+no_data ( columns ) pixcycle;	/* Flush serials after the frame transfers */
+
+frame { 
+	do( rows ) {
+		no_data ( 1 ) fr2serial;
+		no_data ( slosh ) pixcycle;	/* move charge into prescan pixels */
+		no_data ( slosh ) elcycxip;	/* and back */
+		no_data ( slosh ) pixcycle;	/* and */
+		no_data ( slosh ) elcycxip;	/* again */
+		no_data ( slosh ) pixcycle;	/* move charge into prescan pixels */
+		no_data ( slosh ) elcycxip;	/* and back */
+		no_data ( slosh ) pixcycle;	/* and */
+		no_data ( slosh ) elcycxip;	/* again */
+		no_data ( slosh ) pixcycle;	/* move charge into prescan pixels */
+		no_data ( slosh ) elcycxip;	/* and back */
+		no_data ( slosh ) pixcycle;	/* and */
+		no_data ( slosh ) elcycxip;	/* again */
+		no_data ( slosh ) pixcycle;	/* move charge into prescan pixels */
+		no_data ( slosh ) elcycxip;	/* and back */
+		no_data ( slosh ) pixcycle;	/* and */
+		no_data ( slosh ) elcycxip;	/* again */
+		no_data ( 1 ) pixcycle;		/* push through analog chain */
+		pixel_data ( columns ) pixcycle;
+	}
+}
+
+/*
+If we get this far, just keep doing pixcycles until a new frame.
+*/
+
+hold pixcycle;
