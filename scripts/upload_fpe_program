@@ -9,13 +9,13 @@ if __name__ == "__main__":
 
     # Parse the command line arguments
     parser = argparse.ArgumentParser(description='Load a FPE sequencer DSL program to the DHU')
-    parser.add_argument('program', nargs='?', type=str, help='the FPE program to upload')
+    parser.add_argument('program', nargs='?', type=str, help='the FPE program to upload', default='default')
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--debug', action='store_true', help="print debugging information ")
     args = parser.parse_args()
 
     with FPE(args.FPE_number, debug=args.debug) as fpe:
-         if fpe.compile_and_load_fpe_program(args.program if args.program is not None else sys.stdin):
-             print "Loaded program from {0}".format(args.program if args.program is not None else 'standard input')
+         if fpe.compile_and_load_fpe_program(args.program if args.program != "-" else sys.stdin):
+             print "Loaded program from {0}".format(args.program if args.program != "-" else 'standard input')
              sys.exit(0)
     sys.exit(1)
