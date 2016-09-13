@@ -454,35 +454,35 @@ class FPE(object):
         """
         return self.tftp_put(
             fpe_wrapper_bin,
-            "bitmem" + str(self.fpe_number),
+            "bitmem",
             timeout=16)
 
     def upload_sequencer_memory(self, sequencer_memory):
         """Upload the Sequencer Memory to the FPE"""
         return self.tftp_put(
             sequencer_memory,
-            "seqmem" + str(self.fpe_number))
+            "seqmem")
 
     def upload_register_memory(self, register_memory):
         """Upload the Register Memory to the FPE"""
         return self.tftp_put(
             register_memory,
-            "regmem" + str(self.fpe_number))
+            "regmem")
 
     def upload_program_memory(self, program_memory):
         """Upload the Program Memory to the FPE"""
         return self.tftp_put(
             program_memory,
-            "prgmem" + str(self.fpe_number))
+            "prgmem")
 
     def upload_operating_parameter_memory(self, operating_parameter_memory):
         """Upload the Operating Parameter Memory to the FPE"""
         return self.tftp_put(
             operating_parameter_memory,
-            "clvmem" + str(self.fpe_number))
+            "clvmem")
 
     def upload_housekeeping_memory(self, hsk_memory):
         """Upload the Operating Parameter Memory to the FPE"""
         return self.tftp_put(
             hsk_memory,
-            "hskmem" + str(self.fpe_number))
+            "hskmem")
