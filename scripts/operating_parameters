@@ -8,11 +8,19 @@ if __name__ == "__main__":
     import json
     import select
     import random
+    from tessfpe.dhu.ops import OperatingParameters, DerivedOperatingParameter
 
     parser = argparse.ArgumentParser(
-        description='Manage the operating parameters for the DHU.\n\nIf no argument is given, prints the current status of the operating parameters.\n\nExit status indicates if operating parameters are in acceptable range.')
+        description="Manage the operating parameters for the DHU.\n\n" +
+        "If no argument is given, prints the current status of the operating parameters.\n\n" +
+        "Exit status indicates if operating parameters are in acceptable range.")
     parser.add_argument('json', nargs='?', type=argparse.FileType('r'), default=sys.stdin,
                         help='An (optional) JSON file containing the operating parameter settings')
+    parser.add_argument('--no-fpe', action='store_true', help='Disable all FPE communications', default=False)
+    parser.add_argument('--no-fpe-write', '-n', action='store_true', help='Disable writing to FPE', default=False)
+    parser.add_argument('--read',  '-r', metavar="CLV file", nargs='?', type=argparse.FileType('r'), default=None)
+    # Don't use argparse.FileType('w') for --write. Same file may be opened for reading.
+    parser.add_argument('--write', '-w', metavar="CLV file", nargs='?', type=str, default=None)
     parser.add_argument('--FPE-number', metavar='N', type=int, nargs='?', default=1, help='which FPE to use')
     parser.add_argument('--set', nargs='+',
                         help="Set operating parameters by specifying pairs of values, e.g. 'ccd4_reset_low=15.0'")
@@ -23,39 +31,61 @@ if __name__ == "__main__":
     parser.add_argument('--debug', action='store_true', help='Enable debugging output')
     args = parser.parse_args()
 
-    with FPE(args.FPE_number, debug=args.debug) as fpe:
-        status = fpe.frames_running_status
-        try:
-            if select.select([args.json, ], [], [], 0.0)[0]:
-                user_settings = json.load(args.json)
-                for k, v in user_settings.iteritems():
-                    if k not in fpe.ops.keys():
-                        raise Exception("Unknown parameter: {}".format(k))
-                    if (k + "_offset") not in user_settings:
-                        fpe.ops[k].value = v
-                fpe.ops.send()
-            elif args.set_defaults:
-                fpe.ops.reset_to_defaults()
-            elif args.randomize:
-                for op in fpe.ops.address:
-                    if op is not None:
-                        op.value = random.uniform(op.range_low, op.range_high)
-            if args.set:
-                raw_set_parameters = [y for x in args.set
-                                      for y in x.split('=')]
-                if not (len(raw_set_parameters) % 2 == 0):
-                    raise Exception("Could not parse --set arguments into parameter-value pairs: {}".format(args.set))
-                set_parameters = {p: float(v)
-                                  for (p, v) in map(lambda i: raw_set_parameters[i:i + 2],
-                                                    xrange(0, len(raw_set_parameters), 2))}
+    if args.no_fpe:
+        fpe = None
+        ops = OperatingParameters()
+    else:
+        fpe = FPE(args.FPE_number, debug=args.debug)
+        ops = fpe.ops
 
-                for k, v in set_parameters.iteritems():
-                    if k not in fpe.ops.keys():
-                        raise Exception("Unknown parameter: {}".format(k))
-                    if (k + '_offset') not in set_parameters:
-                        fpe.ops[k].value = v
-                fpe.ops.send()
-            print json.dumps(fpe.ops.values, sort_keys=True, indent=4, separators=(',', ': '))
-            sys.exit(0)  # 0 is SUCCESS for shell commands
-        finally:
+    if fpe:
+        status = fpe.frames_running_status
+    else:
+        status = False
+    try:
+        # These are now all possible actions. You can read a CLV file,
+        # set the default values, randomize, read from a json input file,
+        # set parameters on the command line, and finally write to a CLV
+        # file. You don't even need to talk to an FPE.
+        if args.read:
+            ops.read_clvmem(args.read)
+        if args.set_defaults:
+            # copy ops.reset_to_defaults here (except for the .send)
+            for a in ops.address:
+                if a is None:
+                    continue
+                a.value = a.default
+        if args.randomize:
+            for op in ops.address:
+                if op is not None:
+                    op.value = random.uniform(op.range_low, op.range_high)
+        if select.select([args.json, ], [], [], 0.0)[0]:
+            user_settings = json.load(args.json)
+            for k, v in user_settings.iteritems():
+                if k not in ops.keys():
+                    raise Exception("Unknown parameter: {}".format(k))
+                if isinstance(ops[k], DerivedOperatingParameter):
+                    raise Exception("Error: {} is derived. Set {} or {} instead.".format(
+                        k, ops[k]._base.name, ops[k]._offset.name))
+                ops[k].value = v
+        if args.set:
+            for x in args.set:
+                try:
+                    k,v = x.split('=')
+                except ValueError:
+                    raise Exception("Could not parse --set arguments into parameter=value pairs: {}".format(x))
+                if k not in ops.keys():
+                    raise Exception("Unknown parameter: {}".format(k))
+                if isinstance(ops[k], DerivedOperatingParameter):
+                    raise Exception("Error: {} is derived. Set {} or {} instead.".format(
+                        k, ops[k]._base.name, ops[k]._offset.name))
+                ops[k].value = float(v)
+        if args.write:
+            ops.write_clvmem(args.write)
+        if not args.no_fpe_write:
+            ops.send()
+        print json.dumps(ops.values, sort_keys=True, indent=4, separators=(',', ': '))
+        sys.exit(0)  # 0 is SUCCESS for shell commands
+    finally:
+        if fpe:
             fpe.frames_running_status = status

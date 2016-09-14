@@ -22,6 +22,26 @@ def write_mem_file(contents, fmt, file_name):
         return file_name
 
 
+def read_mem_file(fmt, file_name):
+    """Reads a .mem binary file containing the specified contents with a set type
+    :param contents: list
+    :param fmt: str
+    :param file_name: str
+    :rtype : str
+    """
+    import struct
+    if file_name is None:
+        file_name = tempfile.mktemp('Binary.bin')
+    if hasattr(file_name, 'read'):
+        datastr = file_name.read()
+        file_name.close()
+    else:
+        with open(file_name, 'wb') as f:
+            datastr = f.read()
+    szone = struct.calcsize(fmt)
+    return struct.unpack(">{}{}".format(len(datastr) / szone, fmt), datastr)
+
+
 def write_regmem(contents, file_name=tempfile.mktemp('RegMem.bin')):
     """Write the Register memory; contains housekeeping and sequence control values.
     :param contents: list
@@ -106,3 +126,8 @@ def write_clvmem(contents, file_name=None):
                             length=len(contents),
                             contents=contents))
     return write_mem_file(contents, 'H', file_name)
+
+
+def read_clvmem(file_name):
+    """Reads the clock level voltage memory file"""
+    return read_mem_file('H', file_name)

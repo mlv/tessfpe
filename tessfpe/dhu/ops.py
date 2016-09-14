@@ -296,6 +296,22 @@ def values_to_5328(values):
     return map(lambda x, y: x + y, list(values), 16 * range(0, 8 * 4096, 4096))
 
 
+def values_from_5328(values):
+    """Convert AD5328 codes to 12 bit values.
+       The value list is ordered by (chip address)(address within the chip).
+       Each group of 8 values goes to a single chip.
+       The address within the chip must appear as bits 14 through 12 of the
+       code sent to the DAC. Bit 15 must be zero.
+       Assuming that values is a list of 128 integers in the range 0-4095,
+       ordered as above, this expression strips off the extra bits."""
+    for v in values:
+        if not (type(v) is int and (0 <= v < 2 ** 15)):
+            raise Exception("Value must be a unsigned 15 bit integer, was: {}".format(v))
+    if len(values) != 128:
+        raise Exception("Should have 128 values, had: {}".format(len(values)))
+    return map(lambda x: x & 0xFFF, list(values))
+
+
 class OperatingParameters(object):
     def __init__(self, fpe=None, *args, **kwargs):
         import re
@@ -350,6 +366,8 @@ class OperatingParameters(object):
 
     def set_values_from_fpe(self):
         """Get the operating parameters from the FPE and set them"""
+        if not self._fpe:
+            return self
         for idx, val in enumerate(self._fpe.cam_clv()):
             if self.address[idx]:
                 self.address[idx].twelve_bit_value = val
@@ -388,6 +406,13 @@ class OperatingParameters(object):
         return [0 if x is None else x.twelve_bit_value
                 for x in self.address]
 
+    def read_clvmem(self, file_name):
+        """Reads the given CLV file into internal memory"""
+        vals = values_from_5328(binary_files.read_clvmem(file_name))
+        for ii, val in enumerate(vals):
+            if self.address[ii]:
+                self.address[ii].twelve_bit_value = val
+
     def write_clvmem(self, file_name=None):
         """Write the clock level voltage memory; contains values for programming FPE clock level voltages
            (also known as *operating parameters*) via DACs."""
@@ -396,6 +421,8 @@ class OperatingParameters(object):
     def send(self):
         """Send the current DAC values to the hardware."""
         # Get the frames status, restore it after we are done uploading the operating parameters
+        if self._fpe is None:
+            return True
         frames_status = self._fpe.frames_running_status
         self._fpe.cam_stop_frames()
         try:
