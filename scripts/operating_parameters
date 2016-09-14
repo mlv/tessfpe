@@ -65,6 +65,8 @@ if __name__ == "__main__":
                 if k not in ops.keys():
                     raise Exception("Unknown parameter: {}".format(k))
                 if isinstance(ops[k], DerivedOperatingParameter):
+                    if ops[k]._base.name in ops.keys() and ops[k]._offset.name in ops.keys():
+                        continue
                     raise Exception("Error: {} is derived. Set {} or {} instead.".format(
                         k, ops[k]._base.name, ops[k]._offset.name))
                 ops[k].value = v
