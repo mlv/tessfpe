@@ -88,6 +88,8 @@ if __name__ == "__main__":
             ops.send()
         print json.dumps(ops.values, sort_keys=True, indent=4, separators=(',', ': '))
         sys.exit(0)  # 0 is SUCCESS for shell commands
+    except Exception as e:
+        print e
     finally:
         if fpe:
             fpe.frames_running_status = status
